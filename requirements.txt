@@ -1,5 +1,7 @@
-# torch with CUDA: pip install torch --index-url https://download.pytorch.org/whl/cu121
-torch==2.5.1
+# torch with CUDA (Windows): pip install torch --index-url https://download.pytorch.org/whl/cu121
+# On Linux the CPU build is used (the live app has no GPU; it is a fraction of the size)
+torch==2.5.1 ; sys_platform != "linux"
+torch @ https://download.pytorch.org/whl/cpu/torch-2.5.1%2Bcpu-cp312-cp312-linux_x86_64.whl ; sys_platform == "linux"
 transformers==4.46.3
 sentence-transformers==3.3.1
 tokenizers<0.21

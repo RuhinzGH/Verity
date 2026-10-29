@@ -8,7 +8,7 @@ Ruhin Zaidi · 23215149 · BCA (Honours) · GenAI mini project
 ![Python 3.12](https://img.shields.io/badge/python-3.12-blue)
 [![Licence: MIT](https://img.shields.io/badge/licence-MIT-green)](LICENSE)
 
-**Live app:** https://huggingface.co/spaces/RuhinZ/verity ·
+**Live app:** https://verity-ruhinz.streamlit.app ·
 **Fine-tuned verifier:** https://huggingface.co/RuhinZ/verity-deberta-scifact
 
 Verity checks an AI-written answer the way a careful reader would. It breaks the answer
@@ -88,7 +88,7 @@ verifier and for the LLM experiments; the app and the NLI experiments also run o
 ```bash
 python -m venv .venv
 .venv\Scripts\activate                     # Windows; source .venv/bin/activate elsewhere
-pip install torch --index-url https://download.pytorch.org/whl/cu121   # or /whl/cpu without a GPU
+pip install torch --index-url https://download.pytorch.org/whl/cu121   # Windows with a GPU; skip otherwise
 pip install -r requirements.txt
 
 python -m verity.data                      # download the three benchmarks (parquet files)
@@ -98,6 +98,9 @@ python -m verity.models                    # download the local LLMs (optional, 
 
 streamlit run app.py                       # the interface, at http://localhost:8501
 ```
+
+The app also downloads the benchmarks, the verifier and the index itself on its first
+start if they are missing.
 
 The verifier on the Hub is the one experiment 3 trained, unchanged; to train it yourself
 instead, run `python -m experiments.e03_finetune` (needs the GPU). Without it the app falls
@@ -246,33 +249,33 @@ colab/           the cloud-GPU notebooks for experiment 8, with their saved outp
 results/         JSON output of every experiment (v1_before_audit/: the superseded first run)
 figures/         report figures
 tests/           pytest suite (offline)
-deploy/          the Hugging Face Space and model-card files, and the script that publishes them
+deploy/          the model card, and the script that publishes the verifier and the index
 app.py           Streamlit interface
-Dockerfile       the image the live app runs in
 .github/         GitHub Actions: the test suite on every push
 ```
 
 ## Deployment
 
-The live app runs on a free Hugging Face Space (2 CPU cores, 16 GB memory) from the
-`Dockerfile` in this repository. When the image is built it downloads the benchmarks, the
-fine-tuned verifier and the embeddings of the 5,183 SciFact abstracts. The embeddings take
-about an hour to compute on a CPU, so they are computed once and published as a small
-dataset (`RuhinZ/verity-scifact-index`); a visitor never waits for the index. On the
-Space's CPU, a check against pasted sources takes about a second, and one against the
-SciFact corpus about half a minute (the verifier reads every window of the 3 top abstracts
-for each claim; batching windows of similar length made this about a third faster).
+The live app runs on Streamlit Community Cloud (free; about 2.7 GB of memory, and a full
+check needs about 1.5 GB), straight from this repository's `main` branch: every push
+redeploys it. On Linux `requirements.txt` installs the CPU build of torch. On its first
+start the app downloads the benchmarks, the fine-tuned verifier and the embeddings of the
+5,183 SciFact abstracts from the Hugging Face Hub. The embeddings take about an hour to
+compute on a CPU, so they are computed once and published as a small dataset
+(`RuhinZ/verity-scifact-index`); a visitor never waits for the index. On a CPU, a check
+against pasted sources takes about a second, and one against the SciFact corpus about half
+a minute (the verifier reads every window of the 3 top abstracts for each claim; batching
+windows of similar length made this about a third faster).
 
 ```bash
 huggingface-cli login                      # once, with a write token
 python -m deploy.publish model             # upload models/verity-deberta-scifact to the Hub
 python -m deploy.publish index             # upload the SciFact embeddings (computed here once)
-python -m deploy.publish space             # upload the app; the Space rebuilds itself
 ```
 
-The optional Groq key is stored as a Space secret (`GROQ_API_KEY`), never in the code. A
-free Space sleeps after a period without visitors; the first visit afterwards takes about
-a minute while it starts.
+The optional Groq key is stored as an app secret (`GROQ_API_KEY`), never in the code. The
+free app sleeps after a few days without visitors; the next visitor wakes it with one
+click and waits about two minutes while it starts.
 
 ## Licence
 

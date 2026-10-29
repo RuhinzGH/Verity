@@ -6,6 +6,7 @@
 
 The NLI, embedding and reranker models download themselves on first use.
 """
+import hashlib
 import sys
 
 from huggingface_hub import snapshot_download
@@ -26,6 +27,25 @@ def fetch_index() -> str:
     file is picked up as if it had been computed here."""
     return snapshot_download(INDEX_HUB, repo_type="dataset", local_dir=str(CACHE),
                              allow_patterns=["emb_*.npy"])
+
+
+def scifact_index_name() -> str:
+    """The file retrieve.embed caches for Verity.scifact(): the same texts, in the same
+    order, hashed the same way."""
+    from .data import scifact_corpus
+    texts = [f"{d.title}. {d.text}" for d in scifact_corpus().values()]
+    return f"emb_bge-base_{hashlib.sha1(chr(0).join(texts).encode('utf-8')).hexdigest()[:16]}.npy"
+
+
+def ensure_app_assets() -> None:
+    """Download whatever the app needs and is missing (benchmarks, verifier, SciFact index)."""
+    from .data import RAW, download
+    if not any(RAW.glob("scifact__corpus_*.parquet")):
+        download()
+    if not (FINETUNED_NLI / "model.safetensors").exists():
+        fetch_verifier()
+    if not (CACHE / scifact_index_name()).exists():
+        fetch_index()
 
 
 if __name__ == "__main__":

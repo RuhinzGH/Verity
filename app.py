@@ -644,6 +644,17 @@ def scifact_titles() -> dict[str, str]:
     return {k: d.title for k, d in scifact_corpus().items()}
 
 
+@st.cache_resource(show_spinner="First start: downloading the verifier, the SciFact corpus and its index ...")
+def app_assets() -> None:
+    """A fresh clone (or the live app's first start) lacks these; without the verifier
+    the pipeline would silently fall back to the zero-shot model."""
+    from verity.models import ensure_app_assets
+    ensure_app_assets()
+
+
+app_assets()
+
+
 def esc(s) -> str:
     return html.escape(str(s))
 

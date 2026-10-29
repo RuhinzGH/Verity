@@ -13,7 +13,6 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-      # the suite is offline and CPU-only, so the small CPU build of torch is enough
-      - run: pip install torch==2.5.1 --index-url https://download.pytorch.org/whl/cpu
+      # the same install as the live app (CPU build of torch on Linux); the suite is offline
       - run: pip install -r requirements.txt
       - run: python -m pytest -q
