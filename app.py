@@ -576,6 +576,7 @@ CSS = """
 .v-h2 { font: 750 clamp(1.7rem, 3.2vw, 2.4rem)/1.1 "Inter Tight", "Inter", sans-serif; letter-spacing: -.026em; margin: 0 0 .5rem; padding: 0; }
 
 /* ---------- input cards (keyed Streamlit containers) */
+.st-key-v_jump { height: 1px; overflow: hidden; opacity: 0; margin-bottom: -1rem; }
 .st-key-card_answer, .st-key-card_sources {
   border-radius: 1.3rem; padding: 1.25rem 1.3rem 1.1rem;
   background: color-mix(in srgb, currentColor 3.2%, transparent);
@@ -1092,9 +1093,9 @@ st.html(
     '<section class="v-hero"><div>'
     '<span class="v-pill"><i aria-hidden="true"></i>No strings. Only sources.</span>'
     '<h1 class="v-h1">Is this answer<br><span class="v-grad-text">actually true?</span></h1>'
-    '<p class="v-lede">Verity checks an AI-written answer claim by claim against the sources it should agree '
-    'with, and shows the exact passage behind every verdict. When the evidence is not strong enough, '
-    'it says so instead of guessing.</p>'
+    '<p class="v-lede">Verity checks an AI-written answer, or any other text, claim by claim against the '
+    'sources it should agree with, and shows the exact passage behind every verdict. When the evidence is '
+    'not strong enough, it says so instead of guessing.</p>'
     '<div class="v-stats"><div class="v-stat"><b>0.786</b><span>verifier macro-F1, SciFact</span></div>'
     '<div class="v-stat"><b>5,183</b><span>science abstracts to search</span></div>'
     '<div class="v-stat"><b>90%</b><span>calibrated uncertainty target</span></div></div></div>'
@@ -1119,7 +1120,7 @@ with col_a, st.container(key="card_answer"):
              help="Each of the first three examples has one claim the sources contradict and one "
                   "they do not cover. The SciFact example searches the science corpus.")
     st.text_area("AI answer to check", key="answer", height=208,
-                 placeholder="Paste the answer an AI assistant gave you ...")
+                 placeholder="Paste the answer an AI assistant gave you, or any text you want checked ...")
     _ak = f"answer_file_{st.session_state.answer_gen}"
     st.file_uploader("Or upload the answer: .txt, .md, .pdf or .docx", type=FILE_TYPES, key=_ak,
                      on_change=load_answer_file, args=(_ak,), help=FILE_NOTE)
@@ -1182,10 +1183,12 @@ with col_s, st.container(key="card_sources"):
         st.html('<div class="v-panel"><h4>SciFact science corpus</h4>'
                 '<p>5,183 biomedical research abstracts. For each claim Verity finds the 3 most relevant '
                 'abstracts, then the fine-tuned verifier checks every 2-sentence window inside them.</p>'
+                '<p class="v-muted" style="margin:0 0 .5rem;font-size:.85rem"><b>Biomedical science only.</b> '
+                'A claim on any other topic (history, myths, news, a company policy) will come back as not '
+                'enough evidence: that is the corpus speaking, not a judgement that the claim is false. For '
+                'those, switch to pasted sources and add your own.</p>'
                 '<p class="v-muted" style="margin:0;font-size:.85rem">The first check in a session loads '
-                'the corpus and its embeddings, which takes longer. A claim outside biomedicine will '
-                'usually come back as not enough evidence: that is the corpus speaking, not a judgement '
-                'that the claim is false.</p></div>')
+                'the corpus and its embeddings, which takes longer.</p></div>')
 
 st.write("")
 r1, r2 = st.columns([4, 1], gap="small")
@@ -1201,8 +1204,24 @@ st.html('<hr class="v-rule" aria-hidden="true">')
 # Pressing the button only sets `checking`; this run shows "Checking ..." on a disabled
 # button while the check works, then reruns so the button and the report are redrawn.
 out = st.container()
+
+
+def scroll_here(where) -> None:
+    """Bring the next element into view: a 1px frame scrolls itself to the middle of the screen,
+    so a notice that appears below the fold after Check answer is not missed."""
+    js = ("<script>/*%d*/try{var f=window.frameElement;f.style.scrollMarginTop='120px';"
+          "f.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',"
+          "block:'center'});}catch(e){}</script>" % time.time_ns())
+    with where.container(key="v_jump"):
+        if hasattr(st, "iframe"):
+            st.iframe(js, height=1)
+        else:
+            components.html(js, height=1)
+
+
 note = st.session_state.pop("flash", None)
 if note:
+    scroll_here(out)
     getattr(out, note[0])(note[1], icon=note[2])
 if checking:
     st.session_state.checking = False
@@ -1229,6 +1248,7 @@ if checking:
             if mode == SRC_SCIFACT:
                 scifact_titles()
             st.session_state.report = report
+            st.session_state.jump = True
             st.session_state.engine = {
                 "mode": "SciFact corpus (5,183 abstracts)" if mode == SRC_SCIFACT
                         else f"pasted sources ({len(sources)})",
@@ -1253,9 +1273,12 @@ with out:
                     'back as one of:</p>'
                     f'<div class="v-legend">{"".join(chip(k) for k in VERDICTS)}</div></div>')
     elif not report.claims:
+        if st.session_state.pop("jump", False):      # once, right after the check
+            scroll_here(st)
         st.info("No checkable sentences were found in the answer.", icon=":material/info:")
     else:
         eng = st.session_state.get("engine", {})
+        st.session_state.pop("jump", None)           # the report scrolls itself into view
         st.html('<div class="v-sec"><b>03</b><span>The report</span></div>')
         doc, guess = report_component(report, eng, theme_base())
         if hasattr(st, "iframe"):          # components.v1.html is deprecated in newer Streamlit
