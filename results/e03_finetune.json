@@ -1,0 +1,33 @@
+{
+ "base": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+ "epochs": 3,
+ "lr": 2e-05,
+ "batch": 16,
+ "max_length": 384,
+ "fit_pairs": 1051,
+ "calibration_pairs": 263,
+ "fit_label_counts": {
+  "SUPPORTED": 263,
+  "REFUTED": 140,
+  "NEI": 648
+ },
+ "gpu": "NVIDIA GeForce RTX 3050 Laptop GPU",
+ "peak_gpu_memory_gb": 3.99,
+ "log": [
+  {
+   "epoch": 1,
+   "train_loss": 0.736477454087487,
+   "minutes": 3.0
+  },
+  {
+   "epoch": 2,
+   "train_loss": 0.37115652038300184,
+   "minutes": 5.8
+  },
+  {
+   "epoch": 3,
+   "train_loss": 0.18251213745402792,
+   "minutes": 9.2
+  }
+ ]
+}

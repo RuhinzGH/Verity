@@ -1,0 +1,224 @@
+{
+ "scifact_dev": {
+  "n": 300,
+  "accuracy": 0.8466666666666667,
+  "traits": {
+   "number": {
+    "n_with": 119,
+    "acc_with": 0.865546218487395,
+    "acc_without": 0.8342541436464088,
+    "gap": 0.03129207484098617
+   },
+   "negation": {
+    "n_with": 29,
+    "acc_with": 0.9310344827586207,
+    "acc_without": 0.8376383763837638,
+    "gap": 0.09339610637485685
+   },
+   "comparison": {
+    "n_with": 87,
+    "acc_with": 0.8620689655172413,
+    "acc_without": 0.8403755868544601,
+    "gap": 0.021693378662781204
+   },
+   "hedged": {
+    "n_with": 28,
+    "acc_with": 0.8571428571428571,
+    "acc_without": 0.8455882352941176,
+    "gap": 0.011554621848739455
+   },
+   "long": {
+    "n_with": 32,
+    "acc_with": 0.78125,
+    "acc_without": 0.8544776119402985,
+    "gap": -0.07322761194029848
+   }
+  },
+  "confusion": {
+   "SUPPORTED": {
+    "SUPPORTED": 99,
+    "REFUTED": 6,
+    "NEI": 19
+   },
+   "REFUTED": {
+    "SUPPORTED": 7,
+    "REFUTED": 46,
+    "NEI": 11
+   },
+   "NEI": {
+    "SUPPORTED": 1,
+    "REFUTED": 2,
+    "NEI": 109
+   }
+  },
+  "confident_mistakes": [
+   {
+    "claim": "Most termination events in Okazaki fragments are sequence specific.",
+    "evidence": "Via the deep sequencing of Okazaki fragments, we comprehensively document replication fork directionality throughout the S. cerevisiae genome, which permits the systematic analysis of initiation, origin efficiency, fork progression, and termination.",
+    "gold": "SUPPORTED",
+    "predicted": "NEI",
+    "confidence": 0.998853325843811
+   },
+   {
+    "claim": "Hyperfibrinogenemia increases rates of femoropopliteal bypass thrombosis.",
+    "evidence": "RESULTS Markers for smoking (blood carboxyhaemoglobin concentration (p less than 0.05) and plasma thiocyanate concentration (p less than 0.01) and plasma concentrations of fibrinogen (p less than 0.001) and apolipoproteins AI (p less than 0.04) and (a) (p less than 0.05) were significantly higher in patients with occluded grafts. Patency was significantly higher by life table analysis in patients ",
+    "gold": "SUPPORTED",
+    "predicted": "NEI",
+    "confidence": 0.9955026507377625
+   },
+   {
+    "claim": "1,000 genomes project enables mapping of genetic sequence variation consisting of rare variants with larger penetrance effects than common variants.",
+    "evidence": "We propose as an alternative explanation that variants much less common than the associated one may create \"synthetic associations\" by occurring, stochastically, more often in association with one of the alleles at the common site versus the other allele. We show that they are not only possible, but inevitable, and that under simple but reasonable genetic models, they are likely to account for or ",
+    "gold": "SUPPORTED",
+    "predicted": "NEI",
+    "confidence": 0.995455265045166
+   },
+   {
+    "claim": "Auditory entrainment is strengthened when people see congruent visual and auditory information.",
+    "evidence": "UNLABELLED Congruent audiovisual speech enhances our ability to comprehend a speaker, even in noise-free conditions. When incongruent auditory and visual information is presented concurrently, it can hinder a listener's perception and even cause him or her to perceive information that was not presented in either modality. We demonstrate that the cortical representation of the speech envelope is en",
+    "gold": "SUPPORTED",
+    "predicted": "NEI",
+    "confidence": 0.9944690465927124
+   },
+   {
+    "claim": "The tip of the inner tube of the toxic type VI secretion system (T6SS) antibacterial effector in Escherichia coli (E. coli) carries toxic effector proteins.",
+    "evidence": "Here we report that proteins from the PAAR (proline-alanine-alanine-arginine) repeat superfamily form a sharp conical extension on the VgrG spike, which is further involved in attaching effector domains to the spike. The crystal structures of two PAAR-repeat proteins bound to VgrG-like partners show that these proteins sharpen the tip of the T6SS spike complex. Our results indicate a new model of ",
+    "gold": "SUPPORTED",
+    "predicted": "NEI",
+    "confidence": 0.9888601899147034
+   },
+   {
+    "claim": "Cellular aging closely links to an older appearance.",
+    "evidence": "Perceived age, controlled for chronological age and sex, also correlated significantly with physical and cognitive functioning as well as with leucocyte telomere length.   \n CONCLUSION Perceived age-which is widely used by clinicians as a general indication of a patient's health-is a robust biomarker of ageing that predicts survival among those aged >or=70 and correlates with important functional ",
+    "gold": "SUPPORTED",
+    "predicted": "NEI",
+    "confidence": 0.988650918006897
+   },
+   {
+    "claim": "Hyperfibrinogenemia decreases rates of femoropopliteal bypass thrombosis.",
+    "evidence": "RESULTS Markers for smoking (blood carboxyhaemoglobin concentration (p less than 0.05) and plasma thiocyanate concentration (p less than 0.01) and plasma concentrations of fibrinogen (p less than 0.001) and apolipoproteins AI (p less than 0.04) and (a) (p less than 0.05) were significantly higher in patients with occluded grafts. Patency was significantly higher by life table analysis in patients ",
+    "gold": "REFUTED",
+    "predicted": "NEI",
+    "confidence": 0.9824013113975525
+   },
+   {
+    "claim": "Bone marrow cells contribute to adult macrophage compartments.",
+    "evidence": "We also found that after bone marrow transplantation, host macrophages retained the capacity to expand when the development of donor macrophages was compromised.",
+    "gold": "REFUTED",
+    "predicted": "SUPPORTED",
+    "confidence": 0.9820599555969238
+   }
+  ]
+ },
+ "climate_fever": {
+  "n": 6905,
+  "accuracy": 0.6028964518464881,
+  "traits": {
+   "number": {
+    "n_with": 3090,
+    "acc_with": 0.6032362459546926,
+    "acc_without": 0.6026212319790302,
+    "gap": 0.0006150139756624373
+   },
+   "negation": {
+    "n_with": 1245,
+    "acc_with": 0.593574297188755,
+    "acc_without": 0.6049469964664311,
+    "gap": -0.011372699277676146
+   },
+   "comparison": {
+    "n_with": 1615,
+    "acc_with": 0.6346749226006192,
+    "acc_without": 0.593194706994329,
+    "gap": 0.04148021560629023
+   },
+   "hedged": {
+    "n_with": 890,
+    "acc_with": 0.6280898876404495,
+    "acc_without": 0.599168744804655,
+    "gap": 0.0289211428357945
+   },
+   "long": {
+    "n_with": 2985,
+    "acc_with": 0.629145728643216,
+    "acc_without": 0.5829081632653061,
+    "gap": 0.046237565377909906
+   }
+  },
+  "confusion": {
+   "SUPPORTED": {
+    "SUPPORTED": 711,
+    "REFUTED": 80,
+    "NEI": 891
+   },
+   "REFUTED": {
+    "SUPPORTED": 27,
+    "REFUTED": 389,
+    "NEI": 164
+   },
+   "NEI": {
+    "SUPPORTED": 676,
+    "REFUTED": 904,
+    "NEI": 3063
+   }
+  },
+  "confident_mistakes": [
+   {
+    "claim": "And in January, one out of five British children told pollsters they were having nightmares about climate change.",
+    "evidence": "In 2007, the American Academy of Pediatrics issued the policy statement Global Climate Change and Children's Health: Anticipated direct health consequences of climate change include injury and death from extreme weather events and natural disasters, increases in climate-sensitive infectious diseases, increases in air pollution\u2013related illness, and more heat-related, potentially fatal, illness.",
+    "gold": "SUPPORTED",
+    "predicted": "NEI",
+    "confidence": 0.9994596838951111
+   },
+   {
+    "claim": "Early estimates of ocean heat from the Argo showed a cooling bias due to pressure sensor issues.",
+    "evidence": "Ocean heat content can be estimated using temperature measurements obtained by a Nansen bottle, an ARGO float, or ocean acoustic tomography.",
+    "gold": "SUPPORTED",
+    "predicted": "NEI",
+    "confidence": 0.9994575381278992
+   },
+   {
+    "claim": "Another consequence of the fast melting Arctic raises the possibility that there may be even worse extreme weather to come, according to a few scientists: titanic Atlantic superstorms and hurricanes barreling across Europe.",
+    "evidence": "The effects of global warming in the Arctic, or climate change in the Arctic include rising air and water temperatures, loss of sea ice, and melting of the Greenland ice sheet with a related cold temperature anomaly, observed since the 1970s.",
+    "gold": "SUPPORTED",
+    "predicted": "NEI",
+    "confidence": 0.9994162321090698
+   },
+   {
+    "claim": "That drop in temperature came after what was described in the National Geographic as 'six decades of abnormal warmth'.\"",
+    "evidence": "During the winter it is very cold and dark, with the average temperature around \u221228\u00a0\u00b0C (\u221218\u00a0\u00b0F), sometimes dipping as low as \u221250\u00a0\u00b0C (\u221258\u00a0\u00b0F).",
+    "gold": "REFUTED",
+    "predicted": "NEI",
+    "confidence": 0.9993971586227417
+   },
+   {
+    "claim": "At that time, Hansen also produced a model of the future behavior of the globe\u2019s temperature, which he had turned into a video movie that was heavily shopped in Congress.",
+    "evidence": "...Dr. James E. Hansen of the National Aeronautics and Space Administration told a Congressional committee that it was 99 percent certain that the warming trend was not a natural variation but was caused by a buildup of carbon dioxide and other artificial gases in the atmosphere.",
+    "gold": "SUPPORTED",
+    "predicted": "NEI",
+    "confidence": 0.999377429485321
+   },
+   {
+    "claim": "But experts say the energy transition needs to speed up drastically to head off the worst effects of climate change.",
+    "evidence": "Further global climate changes are predicted, with impacts expected to become more costly as time progresses.",
+    "gold": "SUPPORTED",
+    "predicted": "NEI",
+    "confidence": 0.999373733997345
+   },
+   {
+    "claim": "In a paper published online this week in the\u00a0Journal of Geophysical Research-Atmosphere, economics professor Ross McKitrick says the resulting discrepancies may be leading to an overstatement of the role of greenhouse gases in the atmosphere.",
+    "evidence": "The 2007 Fourth Assessment Report compiled by the IPCC (AR4) noted that \"changes in atmospheric concentrations of greenhouse gases and aerosols, land cover and solar radiation alter the energy balance of the climate system\", and concluded that \"increases in anthropogenic greenhouse gas concentrations is very likely to have caused most of the increases in global average temperatures since the mid-2",
+    "gold": "REFUTED",
+    "predicted": "NEI",
+    "confidence": 0.9993442893028259
+   },
+   {
+    "claim": "Another consequence of the fast melting Arctic raises the possibility that there may be even worse extreme weather to come, according to a few scientists: titanic Atlantic superstorms and hurricanes barreling across Europe.",
+    "evidence": "The statement references the IPCC's Fourth Assessment of 2007, and asserts that \"climate change is happening even faster than previously estimated; global CO 2 emissions since 2000 have been higher than even the highest predictions, Arctic sea ice has been melting at rates much faster than predicted, and the rise in the sea level has become more rapid\".",
+    "gold": "SUPPORTED",
+    "predicted": "NEI",
+    "confidence": 0.9993283748626709
+   }
+  ]
+ }
+}

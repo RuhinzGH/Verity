@@ -1,0 +1,691 @@
+{
+ "n_calibration": 161,
+ "models": {
+  "deberta-fever": {
+   "temperature": 3.225678354104425,
+   "calibration_ece_before": 0.2746824492578921,
+   "calibration_ece_after": 0.045517752444521976,
+   "tests": {
+    "scifact_dev": {
+     "n": 300,
+     "ece_before": 0.2422731772065163,
+     "ece_after": 0.037754085163275386,
+     "reliability_after": [
+      {
+       "lo": 0.30000000000000004,
+       "hi": 0.4,
+       "n": 4,
+       "confidence": 0.3792274296283722,
+       "accuracy": 0.5
+      },
+      {
+       "lo": 0.4,
+       "hi": 0.5,
+       "n": 43,
+       "confidence": 0.46287962794303894,
+       "accuracy": 0.5116279069767442
+      },
+      {
+       "lo": 0.5,
+       "hi": 0.6000000000000001,
+       "n": 55,
+       "confidence": 0.54725581407547,
+       "accuracy": 0.6
+      },
+      {
+       "lo": 0.6000000000000001,
+       "hi": 0.7000000000000001,
+       "n": 72,
+       "confidence": 0.6497679948806763,
+       "accuracy": 0.625
+      },
+      {
+       "lo": 0.7000000000000001,
+       "hi": 0.8,
+       "n": 85,
+       "confidence": 0.7519137263298035,
+       "accuracy": 0.7647058823529411
+      },
+      {
+       "lo": 0.8,
+       "hi": 0.9,
+       "n": 41,
+       "confidence": 0.8286682963371277,
+       "accuracy": 0.7560975609756098
+      }
+     ],
+     "risk_coverage": [
+      {
+       "coverage": 0.05,
+       "accuracy": 0.9333333333333333
+      },
+      {
+       "coverage": 0.1,
+       "accuracy": 0.8666666666666667
+      },
+      {
+       "coverage": 0.15,
+       "accuracy": 0.7555555555555555
+      },
+      {
+       "coverage": 0.2,
+       "accuracy": 0.7666666666666667
+      },
+      {
+       "coverage": 0.25,
+       "accuracy": 0.7733333333333333
+      },
+      {
+       "coverage": 0.3,
+       "accuracy": 0.7666666666666667
+      },
+      {
+       "coverage": 0.35,
+       "accuracy": 0.7714285714285715
+      },
+      {
+       "coverage": 0.39999999999999997,
+       "accuracy": 0.7666666666666667
+      },
+      {
+       "coverage": 0.44999999999999996,
+       "accuracy": 0.762962962962963
+      },
+      {
+       "coverage": 0.49999999999999994,
+       "accuracy": 0.7466666666666667
+      },
+      {
+       "coverage": 0.5499999999999999,
+       "accuracy": 0.7515151515151515
+      },
+      {
+       "coverage": 0.6,
+       "accuracy": 0.7444444444444445
+      },
+      {
+       "coverage": 0.65,
+       "accuracy": 0.717948717948718
+      },
+      {
+       "coverage": 0.7,
+       "accuracy": 0.7047619047619048
+      },
+      {
+       "coverage": 0.75,
+       "accuracy": 0.7022222222222222
+      },
+      {
+       "coverage": 0.7999999999999999,
+       "accuracy": 0.6916666666666667
+      },
+      {
+       "coverage": 0.85,
+       "accuracy": 0.6901960784313725
+      },
+      {
+       "coverage": 0.9,
+       "accuracy": 0.6777777777777778
+      },
+      {
+       "coverage": 0.95,
+       "accuracy": 0.6666666666666666
+      },
+      {
+       "coverage": 1.0,
+       "accuracy": 0.66
+      }
+     ],
+     "conformal": {
+      "0.05": {
+       "qhat": 0.8838436603546143,
+       "target_coverage": 0.95,
+       "coverage": 0.9433333333333334,
+       "mean_set_size": 2.3433333333333333,
+       "share_confident": 0.14333333333333334,
+       "accuracy_when_confident": 0.813953488372093,
+       "accuracy_all": 0.66,
+       "share_empty": 0.0
+      },
+      "0.1": {
+       "qhat": 0.8494314551353455,
+       "target_coverage": 0.9,
+       "coverage": 0.9,
+       "mean_set_size": 1.9666666666666666,
+       "share_confident": 0.2966666666666667,
+       "accuracy_when_confident": 0.7752808988764045,
+       "accuracy_all": 0.66,
+       "share_empty": 0.0
+      },
+      "0.2": {
+       "qhat": 0.7964914441108704,
+       "target_coverage": 0.8,
+       "coverage": 0.8433333333333334,
+       "mean_set_size": 1.57,
+       "share_confident": 0.51,
+       "accuracy_when_confident": 0.7516339869281046,
+       "accuracy_all": 0.66,
+       "share_empty": 0.0
+      }
+     }
+    },
+    "climate_fever": {
+     "n": 6905,
+     "ece_before": 0.3118911034296079,
+     "ece_after": 0.10152440907987972,
+     "reliability_after": [
+      {
+       "lo": 0.30000000000000004,
+       "hi": 0.4,
+       "n": 45,
+       "confidence": 0.3738204538822174,
+       "accuracy": 0.4888888888888889
+      },
+      {
+       "lo": 0.4,
+       "hi": 0.5,
+       "n": 575,
+       "confidence": 0.461230993270874,
+       "accuracy": 0.5252173913043479
+      },
+      {
+       "lo": 0.5,
+       "hi": 0.6000000000000001,
+       "n": 942,
+       "confidence": 0.5529233813285828,
+       "accuracy": 0.613588110403397
+      },
+      {
+       "lo": 0.6000000000000001,
+       "hi": 0.7000000000000001,
+       "n": 1505,
+       "confidence": 0.654876172542572,
+       "accuracy": 0.6285714285714286
+      },
+      {
+       "lo": 0.7000000000000001,
+       "hi": 0.8,
+       "n": 2367,
+       "confidence": 0.7523003220558167,
+       "accuracy": 0.6535699197296155
+      },
+      {
+       "lo": 0.8,
+       "hi": 0.9,
+       "n": 1471,
+       "confidence": 0.8291136026382446,
+       "accuracy": 0.6057104010876955
+      }
+     ],
+     "risk_coverage": [
+      {
+       "coverage": 0.05,
+       "accuracy": 0.5420289855072464
+      },
+      {
+       "coverage": 0.1,
+       "accuracy": 0.6057971014492753
+      },
+      {
+       "coverage": 0.15,
+       "accuracy": 0.61003861003861
+      },
+      {
+       "coverage": 0.2,
+       "accuracy": 0.6104272266473569
+      },
+      {
+       "coverage": 0.25,
+       "accuracy": 0.6054461181923523
+      },
+      {
+       "coverage": 0.3,
+       "accuracy": 0.6138996138996139
+      },
+      {
+       "coverage": 0.35,
+       "accuracy": 0.6251551510136533
+      },
+      {
+       "coverage": 0.39999999999999997,
+       "accuracy": 0.6307023895727734
+      },
+      {
+       "coverage": 0.44999999999999996,
+       "accuracy": 0.6337302864499518
+      },
+      {
+       "coverage": 0.49999999999999994,
+       "accuracy": 0.6332560834298957
+      },
+      {
+       "coverage": 0.5499999999999999,
+       "accuracy": 0.6363875724065298
+      },
+      {
+       "coverage": 0.6,
+       "accuracy": 0.6379435191889935
+      },
+      {
+       "coverage": 0.65,
+       "accuracy": 0.6365864527629234
+      },
+      {
+       "coverage": 0.7,
+       "accuracy": 0.6354985519238726
+      },
+      {
+       "coverage": 0.75,
+       "accuracy": 0.6323614597412628
+      },
+      {
+       "coverage": 0.7999999999999999,
+       "accuracy": 0.6341419261404779
+      },
+      {
+       "coverage": 0.85,
+       "accuracy": 0.6336684273300391
+      },
+      {
+       "coverage": 0.9,
+       "accuracy": 0.6309945284840682
+      },
+      {
+       "coverage": 0.95,
+       "accuracy": 0.6263719512195122
+      },
+      {
+       "coverage": 1.0,
+       "accuracy": 0.6207096307023896
+      }
+     ],
+     "conformal": {
+      "0.05": {
+       "qhat": 0.8838436603546143,
+       "target_coverage": 0.95,
+       "coverage": 0.9019551049963794,
+       "mean_set_size": 2.125126719768284,
+       "share_confident": 0.2102824040550326,
+       "accuracy_when_confident": 0.662534435261708,
+       "accuracy_all": 0.6207096307023896,
+       "share_empty": 0.0
+      },
+      "0.1": {
+       "qhat": 0.8494314551353455,
+       "target_coverage": 0.9,
+       "coverage": 0.8295438088341781,
+       "mean_set_size": 1.7487328023171615,
+       "share_confident": 0.39826212889210716,
+       "accuracy_when_confident": 0.6527272727272727,
+       "accuracy_all": 0.6207096307023896,
+       "share_empty": 0.0
+      },
+      "0.2": {
+       "qhat": 0.7964914441108704,
+       "target_coverage": 0.8,
+       "coverage": 0.7611875452570601,
+       "mean_set_size": 1.428095582910934,
+       "share_confident": 0.6139029688631427,
+       "accuracy_when_confident": 0.6518046709129511,
+       "accuracy_all": 0.6207096307023896,
+       "share_empty": 0.0
+      }
+     }
+    }
+   }
+  },
+  "verity-finetuned": {
+   "temperature": 1.8647648617648274,
+   "calibration_ece_before": 0.09680119971310872,
+   "calibration_ece_after": 0.035139875382370095,
+   "tests": {
+    "scifact_dev": {
+     "n": 300,
+     "ece_before": 0.13226251939932504,
+     "ece_after": 0.04269760727882385,
+     "reliability_after": [
+      {
+       "lo": 0.30000000000000004,
+       "hi": 0.4,
+       "n": 1,
+       "confidence": 0.3835790753364563,
+       "accuracy": 1.0
+      },
+      {
+       "lo": 0.4,
+       "hi": 0.5,
+       "n": 14,
+       "confidence": 0.4688800275325775,
+       "accuracy": 0.5
+      },
+      {
+       "lo": 0.5,
+       "hi": 0.6000000000000001,
+       "n": 25,
+       "confidence": 0.5423640012741089,
+       "accuracy": 0.4
+      },
+      {
+       "lo": 0.6000000000000001,
+       "hi": 0.7000000000000001,
+       "n": 22,
+       "confidence": 0.6602587699890137,
+       "accuracy": 0.5909090909090909
+      },
+      {
+       "lo": 0.7000000000000001,
+       "hi": 0.8,
+       "n": 38,
+       "confidence": 0.7472348213195801,
+       "accuracy": 0.7105263157894737
+      },
+      {
+       "lo": 0.8,
+       "hi": 0.9,
+       "n": 70,
+       "confidence": 0.8559170961380005,
+       "accuracy": 0.8714285714285714
+      },
+      {
+       "lo": 0.9,
+       "hi": 1.0,
+       "n": 130,
+       "confidence": 0.9399358630180359,
+       "accuracy": 0.9076923076923077
+      }
+     ],
+     "risk_coverage": [
+      {
+       "coverage": 0.05,
+       "accuracy": 0.9333333333333333
+      },
+      {
+       "coverage": 0.1,
+       "accuracy": 0.9666666666666667
+      },
+      {
+       "coverage": 0.15,
+       "accuracy": 0.9777777777777777
+      },
+      {
+       "coverage": 0.2,
+       "accuracy": 0.95
+      },
+      {
+       "coverage": 0.25,
+       "accuracy": 0.9333333333333333
+      },
+      {
+       "coverage": 0.3,
+       "accuracy": 0.9111111111111111
+      },
+      {
+       "coverage": 0.35,
+       "accuracy": 0.9047619047619048
+      },
+      {
+       "coverage": 0.39999999999999997,
+       "accuracy": 0.9
+      },
+      {
+       "coverage": 0.44999999999999996,
+       "accuracy": 0.9111111111111111
+      },
+      {
+       "coverage": 0.49999999999999994,
+       "accuracy": 0.9
+      },
+      {
+       "coverage": 0.5499999999999999,
+       "accuracy": 0.896969696969697
+      },
+      {
+       "coverage": 0.6,
+       "accuracy": 0.9055555555555556
+      },
+      {
+       "coverage": 0.65,
+       "accuracy": 0.8974358974358975
+      },
+      {
+       "coverage": 0.7,
+       "accuracy": 0.8904761904761904
+      },
+      {
+       "coverage": 0.75,
+       "accuracy": 0.88
+      },
+      {
+       "coverage": 0.7999999999999999,
+       "accuracy": 0.8666666666666667
+      },
+      {
+       "coverage": 0.85,
+       "accuracy": 0.8509803921568627
+      },
+      {
+       "coverage": 0.9,
+       "accuracy": 0.8222222222222222
+      },
+      {
+       "coverage": 0.95,
+       "accuracy": 0.8035087719298246
+      },
+      {
+       "coverage": 1.0,
+       "accuracy": 0.79
+      }
+     ],
+     "conformal": {
+      "0.05": {
+       "qhat": 0.9361798167228699,
+       "target_coverage": 0.95,
+       "coverage": 0.9566666666666667,
+       "mean_set_size": 1.7533333333333334,
+       "share_confident": 0.4066666666666667,
+       "accuracy_when_confident": 0.9180327868852459,
+       "accuracy_all": 0.79,
+       "share_empty": 0.0
+      },
+      "0.1": {
+       "qhat": 0.8636351823806763,
+       "target_coverage": 0.9,
+       "coverage": 0.91,
+       "mean_set_size": 1.4133333333333333,
+       "share_confident": 0.6366666666666667,
+       "accuracy_when_confident": 0.900523560209424,
+       "accuracy_all": 0.79,
+       "share_empty": 0.0
+      },
+      "0.2": {
+       "qhat": 0.42100346088409424,
+       "target_coverage": 0.8,
+       "coverage": 0.7333333333333333,
+       "mean_set_size": 0.8766666666666667,
+       "share_confident": 0.8766666666666667,
+       "accuracy_when_confident": 0.8365019011406845,
+       "accuracy_all": 0.79,
+       "share_empty": 0.12333333333333334
+      }
+     }
+    },
+    "climate_fever": {
+     "n": 6905,
+     "ece_before": 0.2511392069588011,
+     "ece_after": 0.15987449993610728,
+     "reliability_after": [
+      {
+       "lo": 0.30000000000000004,
+       "hi": 0.4,
+       "n": 7,
+       "confidence": 0.38409677147865295,
+       "accuracy": 0.5714285714285714
+      },
+      {
+       "lo": 0.4,
+       "hi": 0.5,
+       "n": 126,
+       "confidence": 0.4675155580043793,
+       "accuracy": 0.3888888888888889
+      },
+      {
+       "lo": 0.5,
+       "hi": 0.6000000000000001,
+       "n": 365,
+       "confidence": 0.5506554841995239,
+       "accuracy": 0.4849315068493151
+      },
+      {
+       "lo": 0.6000000000000001,
+       "hi": 0.7000000000000001,
+       "n": 486,
+       "confidence": 0.6515887379646301,
+       "accuracy": 0.5781893004115226
+      },
+      {
+       "lo": 0.7000000000000001,
+       "hi": 0.8,
+       "n": 769,
+       "confidence": 0.7570829391479492,
+       "accuracy": 0.6553966189856957
+      },
+      {
+       "lo": 0.8,
+       "hi": 0.9,
+       "n": 1726,
+       "confidence": 0.858051061630249,
+       "accuracy": 0.6726535341830823
+      },
+      {
+       "lo": 0.9,
+       "hi": 1.0,
+       "n": 3426,
+       "confidence": 0.9407066106796265,
+       "accuracy": 0.7553998832457677
+      }
+     ],
+     "risk_coverage": [
+      {
+       "coverage": 0.05,
+       "accuracy": 0.808695652173913
+      },
+      {
+       "coverage": 0.1,
+       "accuracy": 0.8260869565217391
+      },
+      {
+       "coverage": 0.15,
+       "accuracy": 0.8088803088803089
+      },
+      {
+       "coverage": 0.2,
+       "accuracy": 0.7936278059377263
+      },
+      {
+       "coverage": 0.25,
+       "accuracy": 0.7757821552723059
+      },
+      {
+       "coverage": 0.3,
+       "accuracy": 0.7712355212355212
+      },
+      {
+       "coverage": 0.35,
+       "accuracy": 0.7674803475382705
+      },
+      {
+       "coverage": 0.39999999999999997,
+       "accuracy": 0.7588703837798697
+      },
+      {
+       "coverage": 0.44999999999999996,
+       "accuracy": 0.7573221757322176
+      },
+      {
+       "coverage": 0.49999999999999994,
+       "accuracy": 0.7546349942062572
+      },
+      {
+       "coverage": 0.5499999999999999,
+       "accuracy": 0.7503949447077409
+      },
+      {
+       "coverage": 0.6,
+       "accuracy": 0.7455949794834661
+      },
+      {
+       "coverage": 0.65,
+       "accuracy": 0.7395276292335116
+      },
+      {
+       "coverage": 0.7,
+       "accuracy": 0.7331402565163426
+      },
+      {
+       "coverage": 0.75,
+       "accuracy": 0.7275535817725429
+      },
+      {
+       "coverage": 0.7999999999999999,
+       "accuracy": 0.7232078204199855
+      },
+      {
+       "coverage": 0.85,
+       "accuracy": 0.7197137502129834
+      },
+      {
+       "coverage": 0.9,
+       "accuracy": 0.7104924364338591
+      },
+      {
+       "coverage": 0.95,
+       "accuracy": 0.7036585365853658
+      },
+      {
+       "coverage": 1.0,
+       "accuracy": 0.689934829833454
+      }
+     ],
+     "conformal": {
+      "0.05": {
+       "qhat": 0.9361798167228699,
+       "target_coverage": 0.95,
+       "coverage": 0.8769007965242578,
+       "mean_set_size": 1.6435916002896451,
+       "share_confident": 0.46372194062273714,
+       "accuracy_when_confident": 0.7660836976889445,
+       "accuracy_all": 0.689934829833454,
+       "share_empty": 0.0
+      },
+      "0.1": {
+       "qhat": 0.8636351823806763,
+       "target_coverage": 0.9,
+       "coverage": 0.8023171614771905,
+       "mean_set_size": 1.310065170166546,
+       "share_confident": 0.7128167994207096,
+       "accuracy_when_confident": 0.7379114181227143,
+       "accuracy_all": 0.689934829833454,
+       "share_empty": 0.0
+      },
+      "0.2": {
+       "qhat": 0.42100346088409424,
+       "target_coverage": 0.8,
+       "coverage": 0.6624185372918175,
+       "mean_set_size": 0.9385952208544533,
+       "share_confident": 0.9385952208544533,
+       "accuracy_when_confident": 0.7057552846782904,
+       "accuracy_all": 0.689934829833454,
+       "share_empty": 0.061404779145546706
+      }
+     }
+    }
+   }
+  }
+ },
+ "deployed": {
+  "model": "verity-finetuned",
+  "alpha": 0.1,
+  "temperature": 1.8647648617648274,
+  "qhat": 0.8636351823806763
+ }
+}

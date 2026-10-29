@@ -1,0 +1,236 @@
+{
+ "scifact_dev": {
+  "n": 300,
+  "accuracy": 0.79,
+  "traits": {
+   "number": {
+    "n_with": 119,
+    "acc_with": 0.8151260504201681,
+    "acc_without": 0.7734806629834254,
+    "gap": 0.04164538743674262
+   },
+   "negation": {
+    "n_with": 29,
+    "acc_with": 0.9310344827586207,
+    "acc_without": 0.7749077490774908,
+    "gap": 0.15612673368112984
+   },
+   "comparison": {
+    "n_with": 87,
+    "acc_with": 0.7816091954022989,
+    "acc_without": 0.7934272300469484,
+    "gap": -0.011818034644649478
+   },
+   "hedged": {
+    "n_with": 28,
+    "acc_with": 0.7142857142857143,
+    "acc_without": 0.7977941176470589,
+    "gap": -0.08350840336134457
+   },
+   "long": {
+    "n_with": 32,
+    "acc_with": 0.6875,
+    "acc_without": 0.8022388059701493,
+    "gap": -0.1147388059701493
+   }
+  },
+  "confusion": {
+   "SUPPORTED": {
+    "SUPPORTED": 89,
+    "REFUTED": 6,
+    "NEI": 29
+   },
+   "REFUTED": {
+    "SUPPORTED": 8,
+    "REFUTED": 45,
+    "NEI": 11
+   },
+   "NEI": {
+    "SUPPORTED": 7,
+    "REFUTED": 2,
+    "NEI": 103
+   }
+  },
+  "mistakes_on_supported": {
+   "total": 35,
+   "said_nei": 29,
+   "said_nei_confident_over_0.9": 14,
+   "median_confidence_of_nei_mistakes": 0.8814914226531982
+  },
+  "confident_mistakes": [
+   {
+    "claim": "Most termination events in Okazaki fragments are sequence specific.",
+    "evidence": "Via the deep sequencing of Okazaki fragments, we comprehensively document replication fork directionality throughout the S. cerevisiae genome, which permits the systematic analysis of initiation, origin efficiency, fork progression, and termination.",
+    "gold": "SUPPORTED",
+    "predicted": "NEI",
+    "confidence": 0.9990614056587219
+   },
+   {
+    "claim": "FoxO3a activation in neuronal death is mediated by reactive oxygen species (ROS).",
+    "evidence": "Thus, one way in which members of the Sir2 family of proteins may increase organismal longevity is by tipping FOXO-dependent responses away from apoptosis and toward stress resistance.",
+    "gold": "SUPPORTED",
+    "predicted": "NEI",
+    "confidence": 0.996976375579834
+   },
+   {
+    "claim": "Pseudogene PTENP1 regulates the expression of PTEN by functioning as an miRNA decoy.",
+    "evidence": "We find that PTENP1 is biologically active as it can regulate cellular levels of PTEN and exert a growth-suppressive role.",
+    "gold": "SUPPORTED",
+    "predicted": "NEI",
+    "confidence": 0.9967607855796814
+   },
+   {
+    "claim": "Rapid phosphotransfer rates govern fidelity in two component systems",
+    "evidence": "In summary, our results provide valuable insight into how cells mediate specificity in one of the most abundant signalling pathways in biology, two-component signal transduction.",
+    "gold": "SUPPORTED",
+    "predicted": "NEI",
+    "confidence": 0.9967425465583801
+   },
+   {
+    "claim": "Rapid up-regulation and higher basal expression of interferon-induced genes increase survival of granule cell neurons that are infected by West Nile virus.",
+    "evidence": "By transducing cortical neurons with genes that were expressed more highly in granule cell neurons, we identified three interferon-stimulated genes (ISGs; Ifi27, Irg1 and Rsad2 (also known as Viperin)) that mediated the antiviral effects against different neurotropic viruses.",
+    "gold": "SUPPORTED",
+    "predicted": "NEI",
+    "confidence": 0.9960447549819946
+   },
+   {
+    "claim": "Non-invasive ventilation use should be decreased if there is inadequate response to conventional treatment.",
+    "evidence": "Modelling of these data indicates that a typical UK hospital providing a non-invasive ventilation service will avoid six deaths and three to nine admissions to intensive care units per year, with an associated cost reduction of 12000-53000 pounds sterling per year.   \n CONCLUSIONS Non-invasive ventilation is a highly cost effective treatment that both reduced total costs and improved mortality in ",
+    "gold": "REFUTED",
+    "predicted": "NEI",
+    "confidence": 0.9957842230796814
+   },
+   {
+    "claim": "Rapid up-regulation and higher basal expression of interferon-induced genes reduce survival of granule cell neurons that are infected by West Nile virus.",
+    "evidence": "By transducing cortical neurons with genes that were expressed more highly in granule cell neurons, we identified three interferon-stimulated genes (ISGs; Ifi27, Irg1 and Rsad2 (also known as Viperin)) that mediated the antiviral effects against different neurotropic viruses.",
+    "gold": "REFUTED",
+    "predicted": "NEI",
+    "confidence": 0.9956132173538208
+   },
+   {
+    "claim": "Cellular aging closely links to an older appearance.",
+    "evidence": "Perceived age, controlled for chronological age and sex, also correlated significantly with physical and cognitive functioning as well as with leucocyte telomere length.   \n CONCLUSION Perceived age-which is widely used by clinicians as a general indication of a patient's health-is a robust biomarker of ageing that predicts survival among those aged >or=70 and correlates with important functional ",
+    "gold": "SUPPORTED",
+    "predicted": "NEI",
+    "confidence": 0.995192289352417
+   }
+  ]
+ },
+ "climate_fever": {
+  "n": 6905,
+  "accuracy": 0.689934829833454,
+  "traits": {
+   "number": {
+    "n_with": 3090,
+    "acc_with": 0.6983818770226538,
+    "acc_without": 0.6830930537352555,
+    "gap": 0.015288823287398223
+   },
+   "negation": {
+    "n_with": 1245,
+    "acc_with": 0.7052208835341366,
+    "acc_without": 0.6865724381625442,
+    "gap": 0.01864844537159238
+   },
+   "comparison": {
+    "n_with": 1615,
+    "acc_with": 0.7003095975232199,
+    "acc_without": 0.6867674858223063,
+    "gap": 0.013542111700913573
+   },
+   "hedged": {
+    "n_with": 890,
+    "acc_with": 0.6887640449438203,
+    "acc_without": 0.6901080631753949,
+    "gap": -0.0013440182315745952
+   },
+   "long": {
+    "n_with": 2985,
+    "acc_with": 0.6907872696817421,
+    "acc_without": 0.6892857142857143,
+    "gap": 0.0015015553960278094
+   }
+  },
+  "confusion": {
+   "SUPPORTED": {
+    "SUPPORTED": 283,
+    "REFUTED": 26,
+    "NEI": 1373
+   },
+   "REFUTED": {
+    "SUPPORTED": 2,
+    "REFUTED": 279,
+    "NEI": 299
+   },
+   "NEI": {
+    "SUPPORTED": 127,
+    "REFUTED": 314,
+    "NEI": 4202
+   }
+  },
+  "mistakes_on_supported": {
+   "total": 1399,
+   "said_nei": 1373,
+   "said_nei_confident_over_0.9": 1141,
+   "median_confidence_of_nei_mistakes": 0.9887962341308594
+  },
+  "confident_mistakes": [
+   {
+    "claim": "Early estimates of ocean heat from the Argo showed a cooling bias due to pressure sensor issues.",
+    "evidence": "Ocean heat content can be estimated using temperature measurements obtained by a Nansen bottle, an ARGO float, or ocean acoustic tomography.",
+    "gold": "SUPPORTED",
+    "predicted": "NEI",
+    "confidence": 0.9995958209037781
+   },
+   {
+    "claim": "The EPA director under Obama said the Clean Power Initiative would have no effect on man-made CO2 emissions.",
+    "evidence": "The Clean Power Plan was an Obama administration policy aimed at combating global warming that was first proposed in 2014.",
+    "gold": "REFUTED",
+    "predicted": "NEI",
+    "confidence": 0.9994139671325684
+   },
+   {
+    "claim": "CO2 levels are measured by hundreds of stations scattered across 66 countries which all report the same rising trend.",
+    "evidence": "Now measurements are made at many sites globally.",
+    "gold": "SUPPORTED",
+    "predicted": "NEI",
+    "confidence": 0.9993952512741089
+   },
+   {
+    "claim": "90 per cent of the world's coral reefs will disappear in the next 35 years due to coral bleaching induced by global warming, pollution and over-development.",
+    "evidence": "Increasing sea temperatures in tropical regions (~1 degree C) the last century have caused major coral bleaching, death, and therefore shrinking coral populations since although they are able to adapt and acclimate, it is uncertain if this evolutionary process will happen quickly enough to prevent major reduction of their numbers.",
+    "gold": "SUPPORTED",
+    "predicted": "NEI",
+    "confidence": 0.9993908405303955
+   },
+   {
+    "claim": "The main reason behind this mid-century cooling was global dimming due to anthropogenic sulfate aerosol emissions.",
+    "evidence": "While most of the earth has warmed, the regions that are downwind from major sources of air pollution (specifically sulfur dioxide emissions) have generally cooled.",
+    "gold": "SUPPORTED",
+    "predicted": "NEI",
+    "confidence": 0.9993844032287598
+   },
+   {
+    "claim": "That drop in temperature came after what was described in the National Geographic as 'six decades of abnormal warmth'.\"",
+    "evidence": "Generally daytime temperatures during the summer rise to about 12\u00a0\u00b0C (54\u00a0\u00b0F) but can often drop to 3\u00a0\u00b0C (37\u00a0\u00b0F) or even below freezing.",
+    "gold": "REFUTED",
+    "predicted": "NEI",
+    "confidence": 0.9993719458580017
+   },
+   {
+    "claim": "It is clear, then, that greening is emerging as a factor with the potential to blunt some of the worst impacts of human greenhouse gas emissions.",
+    "evidence": "While \u2018climate change\u2019 can be due to natural forces or human activity, there is now substantial evidence to indicate that human activity \u2013 and specifically increased greenhouse gas (GHGs) emissions \u2013 is a key factor in the pace and extent of global temperature increases.",
+    "gold": "SUPPORTED",
+    "predicted": "NEI",
+    "confidence": 0.9993504881858826
+   },
+   {
+    "claim": "Every four minutes, another American home or business goes solar.",
+    "evidence": "The wheel moves continuously, removing garbage and dumping it into an attached dumpster using only hydro and solar renewable power to keep its wheel turning.",
+    "gold": "SUPPORTED",
+    "predicted": "NEI",
+    "confidence": 0.9993457198143005
+   }
+  ]
+ }
+}

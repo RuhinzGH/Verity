@@ -1,0 +1,434 @@
+{
+ "scifact_dev": {
+  "_evidence_format": {
+   "SUPPORTED": {
+    "pairs": 124,
+    "mean_sentences": 1.7338709677419355,
+    "mean_chars": 352.25
+   },
+   "REFUTED": {
+    "pairs": 64,
+    "mean_sentences": 1.875,
+    "mean_chars": 384.40625
+   },
+   "NEI": {
+    "pairs": 112,
+    "mean_sentences": 1.8214285714285714,
+    "mean_chars": 330.98214285714283
+   }
+  },
+  "deberta-mnli": {
+   "n": 300,
+   "accuracy": 0.5766666666666667,
+   "macro_f1": 0.5671803026570211,
+   "per_class": {
+    "SUPPORTED": {
+     "precision": 0.925,
+     "recall": 0.29838709677419356,
+     "f1": 0.45121951219512196,
+     "support": 124
+    },
+    "REFUTED": {
+     "precision": 0.6666666666666666,
+     "recall": 0.59375,
+     "f1": 0.628099173553719,
+     "support": 64
+    },
+    "NEI": {
+     "precision": 0.4827586206896552,
+     "recall": 0.875,
+     "f1": 0.6222222222222222,
+     "support": 112
+    }
+   },
+   "macro_f1_ci95": [
+    0.5042202506559577,
+    0.6227948619253384
+   ],
+   "ece": 0.392392371892929,
+   "majority_baseline_accuracy": 0.41333333333333333
+  },
+  "deberta-fever": {
+   "n": 300,
+   "accuracy": 0.66,
+   "macro_f1": 0.6570237663570997,
+   "per_class": {
+    "SUPPORTED": {
+     "precision": 0.8923076923076924,
+     "recall": 0.46774193548387094,
+     "f1": 0.6137566137566137,
+     "support": 124
+    },
+    "REFUTED": {
+     "precision": 0.6885245901639344,
+     "recall": 0.65625,
+     "f1": 0.672,
+     "support": 64
+    },
+    "NEI": {
+     "precision": 0.5632183908045977,
+     "recall": 0.875,
+     "f1": 0.6853146853146853,
+     "support": 112
+    }
+   },
+   "macro_f1_ci95": [
+    0.5980804538627873,
+    0.7094918647401869
+   ],
+   "ece": 0.2422731772065163,
+   "majority_baseline_accuracy": 0.41333333333333333
+  },
+  "verity-finetuned": {
+   "n": 300,
+   "accuracy": 0.79,
+   "macro_f1": 0.7859252202905452,
+   "per_class": {
+    "SUPPORTED": {
+     "precision": 0.8557692307692307,
+     "recall": 0.717741935483871,
+     "f1": 0.7807017543859649,
+     "support": 124
+    },
+    "REFUTED": {
+     "precision": 0.8490566037735849,
+     "recall": 0.703125,
+     "f1": 0.7692307692307693,
+     "support": 64
+    },
+    "NEI": {
+     "precision": 0.7202797202797203,
+     "recall": 0.9196428571428571,
+     "f1": 0.807843137254902,
+     "support": 112
+    }
+   },
+   "macro_f1_ci95": [
+    0.736821468274429,
+    0.8302056417135858
+   ],
+   "ece": 0.13226251939932504,
+   "majority_baseline_accuracy": 0.41333333333333333
+  },
+  "qwen2.5-3b": {
+   "n": 300,
+   "accuracy": 0.64,
+   "macro_f1": 0.5698592164734477,
+   "per_class": {
+    "SUPPORTED": {
+     "precision": 0.8780487804878049,
+     "recall": 0.5806451612903226,
+     "f1": 0.6990291262135923,
+     "support": 124
+    },
+    "REFUTED": {
+     "precision": 0.9285714285714286,
+     "recall": 0.203125,
+     "f1": 0.3333333333333333,
+     "support": 64
+    },
+    "NEI": {
+     "precision": 0.5245098039215687,
+     "recall": 0.9553571428571429,
+     "f1": 0.6772151898734177,
+     "support": 112
+    }
+   },
+   "macro_f1_ci95": [
+    0.5075521322238682,
+    0.629296234430185
+   ],
+   "ece": 0.27766666666666673,
+   "majority_baseline_accuracy": 0.41333333333333333,
+   "parse_errors": 1
+  },
+  "qwen2.5-1.5b": {
+   "n": 300,
+   "accuracy": 0.65,
+   "macro_f1": 0.6368190882040515,
+   "per_class": {
+    "SUPPORTED": {
+     "precision": 0.775,
+     "recall": 0.75,
+     "f1": 0.7622950819672131,
+     "support": 124
+    },
+    "REFUTED": {
+     "precision": 0.4067796610169492,
+     "recall": 0.75,
+     "f1": 0.5274725274725275,
+     "support": 64
+    },
+    "NEI": {
+     "precision": 0.8709677419354839,
+     "recall": 0.48214285714285715,
+     "f1": 0.6206896551724138,
+     "support": 112
+    }
+   },
+   "macro_f1_ci95": [
+    0.5814394662846765,
+    0.688564483695429
+   ],
+   "ece": 0.35036666666666666,
+   "majority_baseline_accuracy": 0.41333333333333333,
+   "parse_errors": 0
+  }
+ },
+ "climate_fever": {
+  "_evidence_format": {
+   "SUPPORTED": {
+    "pairs": 1682,
+    "mean_sentences": 1.0071343638525565,
+    "mean_chars": 174.49346016646848
+   },
+   "REFUTED": {
+    "pairs": 580,
+    "mean_sentences": 1.0086206896551724,
+    "mean_chars": 170.7844827586207
+   },
+   "NEI": {
+    "pairs": 4643,
+    "mean_sentences": 1.0081843635580443,
+    "mean_chars": 170.13353435278916
+   }
+  },
+  "deberta-mnli": {
+   "n": 6905,
+   "accuracy": 0.5808834178131789,
+   "macro_f1": 0.4108981061739418,
+   "per_class": {
+    "SUPPORTED": {
+     "precision": 0.6774193548387096,
+     "recall": 0.08739595719381689,
+     "f1": 0.15481832543443919,
+     "support": 1682
+    },
+    "REFUTED": {
+     "precision": 0.24663402692778458,
+     "recall": 0.6948275862068966,
+     "f1": 0.3640469738030714,
+     "support": 580
+    },
+    "NEI": {
+     "precision": 0.684804115552038,
+     "recall": 0.7454232177471463,
+     "f1": 0.7138290192843147,
+     "support": 4643
+    }
+   },
+   "macro_f1_ci95": [
+    0.39360741682779266,
+    0.42887282561876383
+   ],
+   "ece": 0.3946737438116619,
+   "majority_baseline_accuracy": 0.6724112961622013
+  },
+  "deberta-fever": {
+   "n": 6905,
+   "accuracy": 0.6207096307023896,
+   "macro_f1": 0.44578265196401884,
+   "per_class": {
+    "SUPPORTED": {
+     "precision": 0.6381578947368421,
+     "recall": 0.11533888228299644,
+     "f1": 0.19536757301107754,
+     "support": 1682
+    },
+    "REFUTED": {
+     "precision": 0.28878281622911695,
+     "recall": 0.6258620689655172,
+     "f1": 0.39520958083832336,
+     "support": 580
+    },
+    "NEI": {
+     "precision": 0.6977919161676647,
+     "recall": 0.803144518630196,
+     "f1": 0.7467708020426554,
+     "support": 4643
+    }
+   },
+   "macro_f1_ci95": [
+    0.4264115603170001,
+    0.4639675250400333
+   ],
+   "ece": 0.3118911034296079,
+   "majority_baseline_accuracy": 0.6724112961622013
+  },
+  "verity-finetuned": {
+   "n": 6905,
+   "accuracy": 0.689934829833454,
+   "macro_f1": 0.5115903664669067,
+   "per_class": {
+    "SUPPORTED": {
+     "precision": 0.6868932038834952,
+     "recall": 0.16825208085612367,
+     "f1": 0.2702960840496657,
+     "support": 1682
+    },
+    "REFUTED": {
+     "precision": 0.4507269789983845,
+     "recall": 0.4810344827586207,
+     "f1": 0.4653878231859883,
+     "support": 580
+    },
+    "NEI": {
+     "precision": 0.7153558052434457,
+     "recall": 0.9050183071290114,
+     "f1": 0.7990871921650661,
+     "support": 4643
+    }
+   },
+   "macro_f1_ci95": [
+    0.4898942456208235,
+    0.5317007206394113
+   ],
+   "ece": 0.2511392069588011,
+   "majority_baseline_accuracy": 0.6724112961622013
+  }
+ },
+ "climate_fever_sample": {
+  "_evidence_format": {
+   "SUPPORTED": {
+    "pairs": 100,
+    "mean_sentences": 1.01,
+    "mean_chars": 168.36
+   },
+   "REFUTED": {
+    "pairs": 100,
+    "mean_sentences": 1.0,
+    "mean_chars": 168.11
+   },
+   "NEI": {
+    "pairs": 100,
+    "mean_sentences": 1.0,
+    "mean_chars": 183.34
+   }
+  },
+  "deberta-mnli": {
+   "n": 300,
+   "accuracy": 0.48333333333333334,
+   "macro_f1": 0.43721542483918724,
+   "per_class": {
+    "SUPPORTED": {
+     "precision": 0.8333333333333334,
+     "recall": 0.1,
+     "f1": 0.17857142857142858,
+     "support": 100
+    },
+    "REFUTED": {
+     "precision": 0.6372549019607843,
+     "recall": 0.65,
+     "f1": 0.6435643564356436,
+     "support": 100
+    },
+    "NEI": {
+     "precision": 0.3763440860215054,
+     "recall": 0.7,
+     "f1": 0.48951048951048953,
+     "support": 100
+    }
+   },
+   "macro_f1_ci95": [
+    0.3784304953953936,
+    0.4956378948280852
+   ],
+   "ece": 0.49464525719483693,
+   "majority_baseline_accuracy": 0.3333333333333333
+  },
+  "deberta-fever": {
+   "n": 300,
+   "accuracy": 0.5133333333333333,
+   "macro_f1": 0.47908287819596024,
+   "per_class": {
+    "SUPPORTED": {
+     "precision": 0.7142857142857143,
+     "recall": 0.15,
+     "f1": 0.24793388429752067,
+     "support": 100
+    },
+    "REFUTED": {
+     "precision": 0.6956521739130435,
+     "recall": 0.64,
+     "f1": 0.6666666666666666,
+     "support": 100
+    },
+    "NEI": {
+     "precision": 0.40106951871657753,
+     "recall": 0.75,
+     "f1": 0.5226480836236934,
+     "support": 100
+    }
+   },
+   "macro_f1_ci95": [
+    0.42234873377114945,
+    0.5355939655197489
+   ],
+   "ece": 0.4292209692796071,
+   "majority_baseline_accuracy": 0.3333333333333333
+  },
+  "verity-finetuned": {
+   "n": 300,
+   "accuracy": 0.5166666666666667,
+   "macro_f1": 0.48654424394075724,
+   "per_class": {
+    "SUPPORTED": {
+     "precision": 0.8571428571428571,
+     "recall": 0.18,
+     "f1": 0.2975206611570248,
+     "support": 100
+    },
+    "REFUTED": {
+     "precision": 0.8275862068965517,
+     "recall": 0.48,
+     "f1": 0.6075949367088608,
+     "support": 100
+    },
+    "NEI": {
+     "precision": 0.40271493212669685,
+     "recall": 0.89,
+     "f1": 0.5545171339563862,
+     "support": 100
+    }
+   },
+   "macro_f1_ci95": [
+    0.424890683569697,
+    0.5482703789032909
+   ],
+   "ece": 0.4158873079220454,
+   "majority_baseline_accuracy": 0.3333333333333333
+  },
+  "qwen2.5-3b": {
+   "n": 300,
+   "accuracy": 0.5433333333333333,
+   "macro_f1": 0.5183574879227053,
+   "per_class": {
+    "SUPPORTED": {
+     "precision": 0.90625,
+     "recall": 0.29,
+     "f1": 0.4393939393939394,
+     "support": 100
+    },
+    "REFUTED": {
+     "precision": 0.9473684210526315,
+     "recall": 0.36,
+     "f1": 0.5217391304347826,
+     "support": 100
+    },
+    "NEI": {
+     "precision": 0.4260869565217391,
+     "recall": 0.98,
+     "f1": 0.593939393939394,
+     "support": 100
+    }
+   },
+   "macro_f1_ci95": [
+    0.45506737851155404,
+    0.5804894196788588
+   ],
+   "ece": 0.29766666666666663,
+   "majority_baseline_accuracy": 0.3333333333333333,
+   "parse_errors": 0
+  }
+ }
+}

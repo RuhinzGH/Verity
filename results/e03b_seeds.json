@@ -1,0 +1,143 @@
+{
+ "seeds": [
+  42,
+  7,
+  1234
+ ],
+ "runs": [
+  {
+   "recipe": "standard",
+   "seed": 42,
+   "calibration_macro_f1": 0.8539628545813298,
+   "dev_macro_f1": 0.7859252202905452,
+   "dev_accuracy": 0.79,
+   "dev_ece": 0.1302543059984843,
+   "dev_recall": {
+    "SUPPORTED": 0.717741935483871,
+    "REFUTED": 0.703125,
+    "NEI": 0.9196428571428571
+   },
+   "minutes": 11.3
+  },
+  {
+   "recipe": "standard",
+   "seed": 7,
+   "calibration_macro_f1": 0.8426573426573426,
+   "dev_macro_f1": 0.7877916377916377,
+   "dev_accuracy": 0.79,
+   "dev_ece": 0.14227423906326297,
+   "dev_recall": {
+    "SUPPORTED": 0.6854838709677419,
+    "REFUTED": 0.734375,
+    "NEI": 0.9375
+   },
+   "minutes": 11.5
+  },
+  {
+   "recipe": "standard",
+   "seed": 1234,
+   "calibration_macro_f1": 0.8602005319468654,
+   "dev_macro_f1": 0.7855265700483091,
+   "dev_accuracy": 0.79,
+   "dev_ece": 0.13102010538180672,
+   "dev_recall": {
+    "SUPPORTED": 0.717741935483871,
+    "REFUTED": 0.71875,
+    "NEI": 0.9107142857142857
+   },
+   "minutes": 13.8
+  },
+  {
+   "recipe": "class-balanced",
+   "seed": 42,
+   "calibration_macro_f1": 0.8385378787444954,
+   "dev_macro_f1": 0.7960948294795238,
+   "dev_accuracy": 0.8,
+   "dev_ece": 0.10670369009176894,
+   "dev_recall": {
+    "SUPPORTED": 0.7580645161290323,
+    "REFUTED": 0.734375,
+    "NEI": 0.8839285714285714
+   },
+   "minutes": 12.2
+  },
+  {
+   "recipe": "class-balanced",
+   "seed": 7,
+   "calibration_macro_f1": 0.8300453394684405,
+   "dev_macro_f1": 0.7993368424489571,
+   "dev_accuracy": 0.8033333333333333,
+   "dev_ece": 0.1273079721132914,
+   "dev_recall": {
+    "SUPPORTED": 0.7338709677419355,
+    "REFUTED": 0.75,
+    "NEI": 0.9107142857142857
+   },
+   "minutes": 11.9
+  },
+  {
+   "recipe": "class-balanced",
+   "seed": 1234,
+   "calibration_macro_f1": 0.8316261175596212,
+   "dev_macro_f1": 0.8128612128612129,
+   "dev_accuracy": 0.8133333333333334,
+   "dev_ece": 0.11588499387105304,
+   "dev_recall": {
+    "SUPPORTED": 0.7741935483870968,
+    "REFUTED": 0.796875,
+    "NEI": 0.8660714285714286
+   },
+   "minutes": 22.4
+  }
+ ],
+ "summary": {
+  "standard": {
+   "calibration_macro_f1": {
+    "mean": 0.8522735763951793,
+    "sd": 0.008892756502044795
+   },
+   "dev_macro_f1": {
+    "mean": 0.7864144760434973,
+    "sd": 0.0012091986455146976
+   },
+   "dev_accuracy": {
+    "mean": 0.79,
+    "sd": 0.0
+   },
+   "dev_ece": {
+    "mean": 0.134516216814518,
+    "sd": 0.006729546350452663
+   },
+   "dev_recall_mean": {
+    "SUPPORTED": 0.706989247311828,
+    "REFUTED": 0.71875,
+    "NEI": 0.9226190476190476
+   }
+  },
+  "class-balanced": {
+   "calibration_macro_f1": {
+    "mean": 0.8334031119241857,
+    "sd": 0.004516534907161023
+   },
+   "dev_macro_f1": {
+    "mean": 0.802764294929898,
+    "sd": 0.008893170177573125
+   },
+   "dev_accuracy": {
+    "mean": 0.8055555555555557,
+    "sd": 0.006938886664887101
+   },
+   "dev_ece": {
+    "mean": 0.11663221869203778,
+    "sd": 0.010322444870544482
+   },
+   "dev_recall_mean": {
+    "SUPPORTED": 0.7553763440860215,
+    "REFUTED": 0.7604166666666666,
+    "NEI": 0.8869047619047619
+   }
+  }
+ },
+ "better_on_calibration": "standard",
+ "note": "The deployed model (experiment 3, seed 42, standard recipe) was not replaced."
+}

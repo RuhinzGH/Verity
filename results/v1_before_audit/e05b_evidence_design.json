@@ -1,0 +1,559 @@
+{
+ "calibration": {
+  "top3-concat + deberta-fever": {
+   "n": 161,
+   "accuracy": 0.6459627329192547,
+   "macro_f1": 0.642944936086529,
+   "per_class": {
+    "SUPPORTED": {
+     "precision": 0.7166666666666667,
+     "recall": 0.6231884057971014,
+     "f1": 0.6666666666666666,
+     "support": 69
+    },
+    "REFUTED": {
+     "precision": 0.5319148936170213,
+     "recall": 0.7575757575757576,
+     "f1": 0.625,
+     "support": 33
+    },
+    "NEI": {
+     "precision": 0.6666666666666666,
+     "recall": 0.6101694915254238,
+     "f1": 0.6371681415929203,
+     "support": 59
+    }
+   },
+   "macro_f1_ci95": [
+    0.5630126440160718,
+    0.71072430195952
+   ],
+   "confusion": {
+    "SUPPORTED": {
+     "SUPPORTED": 43,
+     "REFUTED": 12,
+     "NEI": 14
+    },
+    "REFUTED": {
+     "SUPPORTED": 4,
+     "REFUTED": 25,
+     "NEI": 4
+    },
+    "NEI": {
+     "SUPPORTED": 13,
+     "REFUTED": 10,
+     "NEI": 36
+    }
+   }
+  },
+  "top3-concat + verity-finetuned": {
+   "n": 161,
+   "accuracy": 0.5714285714285714,
+   "macro_f1": 0.5375691165096582,
+   "per_class": {
+    "SUPPORTED": {
+     "precision": 0.8823529411764706,
+     "recall": 0.43478260869565216,
+     "f1": 0.5825242718446602,
+     "support": 69
+    },
+    "REFUTED": {
+     "precision": 0.7142857142857143,
+     "recall": 0.30303030303030304,
+     "f1": 0.425531914893617,
+     "support": 33
+    },
+    "NEI": {
+     "precision": 0.46017699115044247,
+     "recall": 0.8813559322033898,
+     "f1": 0.6046511627906976,
+     "support": 59
+    }
+   },
+   "macro_f1_ci95": [
+    0.44298666162243844,
+    0.6220097703056395
+   ],
+   "confusion": {
+    "SUPPORTED": {
+     "SUPPORTED": 30,
+     "REFUTED": 1,
+     "NEI": 38
+    },
+    "REFUTED": {
+     "SUPPORTED": 0,
+     "REFUTED": 10,
+     "NEI": 23
+    },
+    "NEI": {
+     "SUPPORTED": 4,
+     "REFUTED": 3,
+     "NEI": 52
+    }
+   }
+  },
+  "per-sentence + deberta-fever": {
+   "n": 161,
+   "accuracy": 0.5031055900621118,
+   "macro_f1": 0.4998390092879257,
+   "per_class": {
+    "SUPPORTED": {
+     "precision": 0.8181818181818182,
+     "recall": 0.391304347826087,
+     "f1": 0.5294117647058824,
+     "support": 69
+    },
+    "REFUTED": {
+     "precision": 0.358695652173913,
+     "recall": 1.0,
+     "f1": 0.528,
+     "support": 33
+    },
+    "NEI": {
+     "precision": 0.5833333333333334,
+     "recall": 0.3559322033898305,
+     "f1": 0.4421052631578947,
+     "support": 59
+    }
+   },
+   "macro_f1_ci95": [
+    0.4207636161277273,
+    0.5707650614355688
+   ],
+   "confusion": {
+    "SUPPORTED": {
+     "SUPPORTED": 27,
+     "REFUTED": 27,
+     "NEI": 15
+    },
+    "REFUTED": {
+     "SUPPORTED": 0,
+     "REFUTED": 33,
+     "NEI": 0
+    },
+    "NEI": {
+     "SUPPORTED": 6,
+     "REFUTED": 32,
+     "NEI": 21
+    }
+   }
+  },
+  "per-sentence + verity-finetuned": {
+   "n": 161,
+   "accuracy": 0.5279503105590062,
+   "macro_f1": 0.44277395008103104,
+   "per_class": {
+    "SUPPORTED": {
+     "precision": 0.5851063829787234,
+     "recall": 0.7971014492753623,
+     "f1": 0.6748466257668712,
+     "support": 69
+    },
+    "REFUTED": {
+     "precision": 0.421875,
+     "recall": 0.8181818181818182,
+     "f1": 0.5567010309278351,
+     "support": 33
+    },
+    "NEI": {
+     "precision": 1.0,
+     "recall": 0.05084745762711865,
+     "f1": 0.0967741935483871,
+     "support": 59
+    }
+   },
+   "macro_f1_ci95": [
+    0.37713917929085133,
+    0.507663404946184
+   ],
+   "confusion": {
+    "SUPPORTED": {
+     "SUPPORTED": 55,
+     "REFUTED": 14,
+     "NEI": 0
+    },
+    "REFUTED": {
+     "SUPPORTED": 6,
+     "REFUTED": 27,
+     "NEI": 0
+    },
+    "NEI": {
+     "SUPPORTED": 33,
+     "REFUTED": 23,
+     "NEI": 3
+    }
+   }
+  },
+  "windows + deberta-fever": {
+   "n": 161,
+   "accuracy": 0.5714285714285714,
+   "macro_f1": 0.5595947768078916,
+   "per_class": {
+    "SUPPORTED": {
+     "precision": 0.7924528301886793,
+     "recall": 0.6086956521739131,
+     "f1": 0.6885245901639344,
+     "support": 69
+    },
+    "REFUTED": {
+     "precision": 0.379746835443038,
+     "recall": 0.9090909090909091,
+     "f1": 0.5357142857142857,
+     "support": 33
+    },
+    "NEI": {
+     "precision": 0.6896551724137931,
+     "recall": 0.3389830508474576,
+     "f1": 0.45454545454545453,
+     "support": 59
+    }
+   },
+   "macro_f1_ci95": [
+    0.47995057964858084,
+    0.6278902104403907
+   ],
+   "confusion": {
+    "SUPPORTED": {
+     "SUPPORTED": 42,
+     "REFUTED": 19,
+     "NEI": 8
+    },
+    "REFUTED": {
+     "SUPPORTED": 2,
+     "REFUTED": 30,
+     "NEI": 1
+    },
+    "NEI": {
+     "SUPPORTED": 9,
+     "REFUTED": 30,
+     "NEI": 20
+    }
+   }
+  },
+  "windows + verity-finetuned": {
+   "n": 161,
+   "accuracy": 0.6086956521739131,
+   "macro_f1": 0.5670039295770289,
+   "per_class": {
+    "SUPPORTED": {
+     "precision": 0.6236559139784946,
+     "recall": 0.8405797101449275,
+     "f1": 0.7160493827160493,
+     "support": 69
+    },
+    "REFUTED": {
+     "precision": 0.5294117647058824,
+     "recall": 0.8181818181818182,
+     "f1": 0.6428571428571429,
+     "support": 33
+    },
+    "NEI": {
+     "precision": 0.7647058823529411,
+     "recall": 0.22033898305084745,
+     "f1": 0.34210526315789475,
+     "support": 59
+    }
+   },
+   "macro_f1_ci95": [
+    0.4842053312841356,
+    0.6393060220660473
+   ],
+   "confusion": {
+    "SUPPORTED": {
+     "SUPPORTED": 58,
+     "REFUTED": 8,
+     "NEI": 3
+    },
+    "REFUTED": {
+     "SUPPORTED": 5,
+     "REFUTED": 27,
+     "NEI": 1
+    },
+    "NEI": {
+     "SUPPORTED": 30,
+     "REFUTED": 16,
+     "NEI": 13
+    }
+   }
+  }
+ },
+ "chosen_on_calibration": "top3-concat + deberta-fever",
+ "dev": {
+  "top3-concat + deberta-fever": {
+   "n": 300,
+   "accuracy": 0.6,
+   "macro_f1": 0.5939015939015939,
+   "per_class": {
+    "SUPPORTED": {
+     "precision": 0.7346938775510204,
+     "recall": 0.5806451612903226,
+     "f1": 0.6486486486486487,
+     "support": 124
+    },
+    "REFUTED": {
+     "precision": 0.45652173913043476,
+     "recall": 0.65625,
+     "f1": 0.5384615384615384,
+     "support": 64
+    },
+    "NEI": {
+     "precision": 0.6,
+     "recall": 0.5892857142857143,
+     "f1": 0.5945945945945946,
+     "support": 112
+    }
+   },
+   "macro_f1_ci95": [
+    0.5346043433283795,
+    0.6516856184268939
+   ],
+   "confusion": {
+    "SUPPORTED": {
+     "SUPPORTED": 72,
+     "REFUTED": 22,
+     "NEI": 30
+    },
+    "REFUTED": {
+     "SUPPORTED": 8,
+     "REFUTED": 42,
+     "NEI": 14
+    },
+    "NEI": {
+     "SUPPORTED": 18,
+     "REFUTED": 28,
+     "NEI": 66
+    }
+   }
+  },
+  "top3-concat + verity-finetuned": {
+   "n": 300,
+   "accuracy": 0.59,
+   "macro_f1": 0.5761292758831725,
+   "per_class": {
+    "SUPPORTED": {
+     "precision": 0.8,
+     "recall": 0.3870967741935484,
+     "f1": 0.5217391304347826,
+     "support": 124
+    },
+    "REFUTED": {
+     "precision": 0.8235294117647058,
+     "recall": 0.4375,
+     "f1": 0.5714285714285714,
+     "support": 64
+    },
+    "NEI": {
+     "precision": 0.49029126213592233,
+     "recall": 0.9017857142857143,
+     "f1": 0.6352201257861635,
+     "support": 112
+    }
+   },
+   "macro_f1_ci95": [
+    0.5110935118730325,
+    0.6390177672713686
+   ],
+   "confusion": {
+    "SUPPORTED": {
+     "SUPPORTED": 48,
+     "REFUTED": 2,
+     "NEI": 74
+    },
+    "REFUTED": {
+     "SUPPORTED": 5,
+     "REFUTED": 28,
+     "NEI": 31
+    },
+    "NEI": {
+     "SUPPORTED": 7,
+     "REFUTED": 4,
+     "NEI": 101
+    }
+   }
+  },
+  "per-sentence + deberta-fever": {
+   "n": 300,
+   "accuracy": 0.49666666666666665,
+   "macro_f1": 0.49763324736729,
+   "per_class": {
+    "SUPPORTED": {
+     "precision": 0.78125,
+     "recall": 0.4032258064516129,
+     "f1": 0.5319148936170213,
+     "support": 124
+    },
+    "REFUTED": {
+     "precision": 0.33974358974358976,
+     "recall": 0.828125,
+     "f1": 0.4818181818181818,
+     "support": 64
+    },
+    "NEI": {
+     "precision": 0.575,
+     "recall": 0.4107142857142857,
+     "f1": 0.4791666666666667,
+     "support": 112
+    }
+   },
+   "macro_f1_ci95": [
+    0.4445123051761413,
+    0.551168165099133
+   ],
+   "confusion": {
+    "SUPPORTED": {
+     "SUPPORTED": 50,
+     "REFUTED": 47,
+     "NEI": 27
+    },
+    "REFUTED": {
+     "SUPPORTED": 4,
+     "REFUTED": 53,
+     "NEI": 7
+    },
+    "NEI": {
+     "SUPPORTED": 10,
+     "REFUTED": 56,
+     "NEI": 46
+    }
+   }
+  },
+  "per-sentence + verity-finetuned": {
+   "n": 300,
+   "accuracy": 0.58,
+   "macro_f1": 0.49462759462759465,
+   "per_class": {
+    "SUPPORTED": {
+     "precision": 0.601063829787234,
+     "recall": 0.9112903225806451,
+     "f1": 0.7243589743589743,
+     "support": 124
+    },
+    "REFUTED": {
+     "precision": 0.5192307692307693,
+     "recall": 0.84375,
+     "f1": 0.6428571428571429,
+     "support": 64
+    },
+    "NEI": {
+     "precision": 0.875,
+     "recall": 0.0625,
+     "f1": 0.11666666666666667,
+     "support": 112
+    }
+   },
+   "macro_f1_ci95": [
+    0.4472280570666267,
+    0.5387214275575632
+   ],
+   "confusion": {
+    "SUPPORTED": {
+     "SUPPORTED": 113,
+     "REFUTED": 10,
+     "NEI": 1
+    },
+    "REFUTED": {
+     "SUPPORTED": 10,
+     "REFUTED": 54,
+     "NEI": 0
+    },
+    "NEI": {
+     "SUPPORTED": 65,
+     "REFUTED": 40,
+     "NEI": 7
+    }
+   }
+  },
+  "windows + deberta-fever": {
+   "n": 300,
+   "accuracy": 0.5533333333333333,
+   "macro_f1": 0.5483974943745059,
+   "per_class": {
+    "SUPPORTED": {
+     "precision": 0.7608695652173914,
+     "recall": 0.5645161290322581,
+     "f1": 0.6481481481481481,
+     "support": 124
+    },
+    "REFUTED": {
+     "precision": 0.3698630136986301,
+     "recall": 0.84375,
+     "f1": 0.5142857142857142,
+     "support": 64
+    },
+    "NEI": {
+     "precision": 0.6774193548387096,
+     "recall": 0.375,
+     "f1": 0.4827586206896552,
+     "support": 112
+    }
+   },
+   "macro_f1_ci95": [
+    0.4909817700171759,
+    0.6013963131369106
+   ],
+   "confusion": {
+    "SUPPORTED": {
+     "SUPPORTED": 70,
+     "REFUTED": 39,
+     "NEI": 15
+    },
+    "REFUTED": {
+     "SUPPORTED": 5,
+     "REFUTED": 54,
+     "NEI": 5
+    },
+    "NEI": {
+     "SUPPORTED": 17,
+     "REFUTED": 53,
+     "NEI": 42
+    }
+   }
+  },
+  "windows + verity-finetuned": {
+   "n": 300,
+   "accuracy": 0.6166666666666667,
+   "macro_f1": 0.5847593969825734,
+   "per_class": {
+    "SUPPORTED": {
+     "precision": 0.6375,
+     "recall": 0.8225806451612904,
+     "f1": 0.7183098591549296,
+     "support": 124
+    },
+    "REFUTED": {
+     "precision": 0.5242718446601942,
+     "recall": 0.84375,
+     "f1": 0.6467065868263473,
+     "support": 64
+    },
+    "NEI": {
+     "precision": 0.7837837837837838,
+     "recall": 0.25892857142857145,
+     "f1": 0.38926174496644295,
+     "support": 112
+    }
+   },
+   "macro_f1_ci95": [
+    0.5284508282805932,
+    0.633092725950786
+   ],
+   "confusion": {
+    "SUPPORTED": {
+     "SUPPORTED": 102,
+     "REFUTED": 15,
+     "NEI": 7
+    },
+    "REFUTED": {
+     "SUPPORTED": 9,
+     "REFUTED": 54,
+     "NEI": 1
+    },
+    "NEI": {
+     "SUPPORTED": 49,
+     "REFUTED": 34,
+     "NEI": 29
+    }
+   }
+  }
+ }
+}
