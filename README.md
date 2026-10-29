@@ -263,10 +263,12 @@ redeploys it. On Linux `requirements.txt` installs the CPU build of torch. On it
 start the app downloads the benchmarks, the fine-tuned verifier and the embeddings of the
 5,183 SciFact abstracts from the Hugging Face Hub. The embeddings take about an hour to
 compute on a CPU, so they are computed once and published as a small dataset
-(`RuhinZ/verity-scifact-index`); a visitor never waits for the index. On a CPU, a check
-against pasted sources takes about a second, and one against the SciFact corpus about half
-a minute (the verifier reads every window of the 3 top abstracts for each claim; batching
-windows of similar length made this about a third faster).
+(`RuhinZ/verity-scifact-index`); a visitor never waits for the index. A check against
+pasted sources takes 1-3 seconds. One against the SciFact corpus took about 30 seconds on
+the laptop's CPU and 12-45 seconds on the free cloud server, whose CPU is shared (the
+verifier reads every window of the 3 top abstracts for each claim; batching windows of
+similar length made this about a third faster). The engine line under each report gives
+its time.
 
 ```bash
 huggingface-cli login                      # once, with a write token
