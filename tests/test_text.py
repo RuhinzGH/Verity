@@ -96,3 +96,38 @@ def test_windows():
     assert windows(["only"], 2) == ["only"]
     assert windows([], 2) == []
     assert windows(s, 1) == s
+
+
+# ------------------------------------------------------------------ claim_parts
+from verity.text import claim_parts  # noqa: E402
+
+
+def _parts(sentence, claims):
+    return [(sentence[a:e], j) for a, e, j in claim_parts(sentence, claims)]
+
+
+def test_claim_parts_splits_a_compound_sentence():
+    s = "Pure water boils at 100 degrees Celsius and freezes at 10 degrees Celsius."
+    got = _parts(s, ["Pure water boils at 100 degrees Celsius.", "Pure water freezes at 10 degrees Celsius."])
+    assert got == [("Pure water boils at 100 degrees Celsius ", 0), ("and freezes at 10 degrees Celsius.", 1)]
+
+
+def test_claim_parts_cover_the_sentence_in_order():
+    s = "Marie Curie, born in Warsaw, won the Nobel Prize in Physics in 1903 and in Chemistry in 1911."
+    claims = ["Marie Curie was born in Warsaw.", "Marie Curie won the Nobel Prize in Physics in 1903.",
+              "Marie Curie won the Nobel Prize in Chemistry in 1911."]
+    parts = claim_parts(s, claims)
+    assert parts[0][0] == 0 and parts[-1][1] == len(s)
+    assert all(e1 == a2 for (_, e1, _), (a2, _, _) in zip(parts, parts[1:]))
+    assert _parts(s, claims) == [("Marie Curie, born in Warsaw, ", 0),
+                                 ("won the Nobel Prize in Physics in 1903 ", 1),
+                                 ("and in Chemistry in 1911.", 2)]
+
+
+@pytest.mark.parametrize("sentence, claims", [
+    ("Mars is red.", ["Mars is red."]),                                   # one claim: nothing to split
+    ("Mars is red and cold.", ["Mars is red.", "Mars is red."]),          # claims share every word
+    ("Mars is the fourth planet.", ["Mars is a planet.", "Mars is fourth."]),  # no place to cut
+])
+def test_claim_parts_gives_up_when_parts_cannot_be_told_apart(sentence, claims):
+    assert claim_parts(sentence, claims) == []

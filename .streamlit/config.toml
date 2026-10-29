@@ -1,40 +1,31 @@
 [theme]
 base = "dark"
-primaryColor = "#f0b54a"
-backgroundColor = "#0b0a0d"
-secondaryBackgroundColor = "#16131a"
-textColor = "#ddd8d4"
-borderColor = "#2c262d"
+primaryColor = "#22d3ee"
+backgroundColor = "#05060b"
+secondaryBackgroundColor = "#0e1120"
+textColor = "#e6eaf8"
+borderColor = "#1d2236"
 showWidgetBorder = true
 showSidebarBorder = true
-baseRadius = "0.55rem"
-font = "sans serif"
-
-[theme.sidebar]
-backgroundColor = "#0f0d11"
-secondaryBackgroundColor = "#1a161c"
+baseRadius = "0.8rem"
+buttonRadius = "full"
+font = "Inter:https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+headingFont = "Inter Tight:https://fonts.googleapis.com/css2?family=Inter+Tight:wght@600;700;800&display=swap"
+codeFont = "JetBrains Mono:https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap"
 
 [theme.light]
-primaryColor = "#b45309"
-backgroundColor = "#ffffff"
-secondaryBackgroundColor = "#f6f3ef"
-textColor = "#2a2326"
-borderColor = "#ddd5cf"
-
-[theme.light.sidebar]
-backgroundColor = "#faf7f3"
-secondaryBackgroundColor = "#f1ece6"
+primaryColor = "#0891b2"
+backgroundColor = "#f6f7fb"
+secondaryBackgroundColor = "#ffffff"
+textColor = "#141a2e"
+borderColor = "#dde1ec"
 
 [theme.dark]
-primaryColor = "#f0b54a"
-backgroundColor = "#0b0a0d"
-secondaryBackgroundColor = "#16131a"
-textColor = "#ddd8d4"
-borderColor = "#2c262d"
-
-[theme.dark.sidebar]
-backgroundColor = "#0f0d11"
-secondaryBackgroundColor = "#1a161c"
+primaryColor = "#22d3ee"
+backgroundColor = "#05060b"
+secondaryBackgroundColor = "#0e1120"
+textColor = "#e6eaf8"
+borderColor = "#1d2236"
 
 [client]
 toolbarMode = "viewer"

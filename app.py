@@ -19,6 +19,8 @@ from pathlib import Path
 import streamlit as st
 import streamlit.components.v1 as components
 
+from verity.text import STOPWORDS, WORD, claim_parts, content_words, stem
+
 ROOT = Path(__file__).resolve().parent
 
 # ------------------------------------------------------------------ constants
@@ -84,29 +86,33 @@ FINETUNED_DIR = ROOT / "models" / "verity-deberta-scifact"
 # ------------------------------------------------------------------ report component assets
 # Colour tokens per theme. Verdict text colours are tuned for >= 4.5:1 on the card
 # backgrounds of their theme; fills (bars, icons) carry dark ink in both themes.
+REPORT_FONTS = ("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800"
+                "&family=Inter+Tight:wght@600;700;800&family=JetBrains+Mono:wght@500;600&display=swap")
 REPORT_CSS = r"""
+/* --brand is the cyan of the page's beam (focus rings, the All chip, the engine line);
+   --scan is the indigo the answer shows while the reveal decodes it. Neither marks a verdict. */
 :root { color-scheme: dark;
-  --bg:#0b0a0d; --panel:#131016; --panel2:#1a161d; --line:#2c262d; --text:#ddd8d4; --muted:#aaa1a4;
-  --gold:#f0b54a; --gold-t:#f3c06a; --crim:#e0313b; --crim-t:#ff7a80; --ink:#0a0c0f;
-  --ok:#22c55e; --ok-t:#4ade80; --bad:#fb7185; --bad-t:#fda4af; --nei:#94a3b8; --nei-t:#cbd5e1;
-  --unc:#a78bfa; --unc-t:#c4b5fd; --mark:rgba(240,181,74,.24); --mark-line:rgba(240,181,74,.75);
-  --lift:rgba(240,181,74,.07); --shadow:0 10px 30px -14px rgba(0,0,0,.8); }
+  --bg:#05060b; --panel:#0c0f1b; --panel2:#121629; --line:#1f2539; --text:#e6eaf8; --muted:#9aa3bf;
+  --brand:#22d3ee; --brand-t:#67e8f9; --scan:#6366f1; --scan-t:#a5b4fc; --ink:#06080f;
+  --ok:#34d399; --ok-t:#6ee7b7; --bad:#fb7185; --bad-t:#fda4af; --nei:#94a3b8; --nei-t:#cbd5e1;
+  --unc:#fbbf24; --unc-t:#fcd34d; --mark:rgba(34,211,238,.20); --mark-line:rgba(34,211,238,.7);
+  --shadow:0 18px 44px -24px rgba(0,0,0,.9); }
 [data-theme="light"] { color-scheme: light;
-  --bg:#ffffff; --panel:#fbf9f7; --panel2:#f3eee8; --line:#e2d9d1; --text:#2a2326; --muted:#5d5357;
-  --gold:#d4951f; --gold-t:#8a4b08; --crim:#c81e2a; --crim-t:#b4161f; --ink:#0a0c0f;
-  --ok:#22c55e; --ok-t:#166534; --bad:#fb7185; --bad-t:#be123c; --nei:#94a3b8; --nei-t:#475569;
-  --unc:#a78bfa; --unc-t:#6d28d9; --mark:rgba(240,181,74,.38); --mark-line:rgba(180,110,10,.8);
-  --lift:rgba(212,149,31,.08); --shadow:0 10px 28px -16px rgba(60,40,20,.35); }
+  --bg:#f6f7fb; --panel:#ffffff; --panel2:#f1f4fb; --line:#dde1ec; --text:#141a2e; --muted:#525b75;
+  --brand:#0891b2; --brand-t:#0e7490; --scan:#4f46e5; --scan-t:#4338ca; --ink:#06080f;
+  --ok:#34d399; --ok-t:#047857; --bad:#fb7185; --bad-t:#be123c; --nei:#94a3b8; --nei-t:#475569;
+  --unc:#fbbf24; --unc-t:#b45309; --mark:rgba(8,145,178,.16); --mark-line:rgba(8,145,178,.7);
+  --shadow:0 14px 34px -22px rgba(20,30,60,.35); }
 .v-SUPPORTED { --c:var(--ok); --ct:var(--ok-t); } .v-REFUTED { --c:var(--bad); --ct:var(--bad-t); }
 .v-NEI { --c:var(--nei); --ct:var(--nei-t); } .v-UNCERTAIN { --c:var(--unc); --ct:var(--unc-t); }
 *, *::before, *::after { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); }
-body { font: 16px/1.5 "Source Sans 3", "Source Sans Pro", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+body { font: 16px/1.5 "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   -webkit-font-smoothing: antialiased; overflow: hidden; }
 #vr { padding: 2px 2px 6px; }
 h2, h3, p { margin: 0; }
 button { font: inherit; color: inherit; }
-:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
 .ico { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 1.1rem; height: 1.1rem;
   border-radius: 50%; font-size: .68rem; font-weight: 800; line-height: 1; background: var(--c); color: var(--ink); }
 .chip { display: inline-flex; align-items: center; gap: .38rem; padding: .14rem .62rem .14rem .28rem; border-radius: 999px;
@@ -115,9 +121,9 @@ button { font: inherit; color: inherit; }
 
 /* ---------- header */
 .hl { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .3rem 1rem; }
-.hl h2 { font-size: 1.42rem; line-height: 1.25; font-weight: 700; letter-spacing: -.005em; }
+.hl h2 { font: 750 1.6rem/1.2 "Inter Tight", "Inter", sans-serif; letter-spacing: -.02em; }
 .sub { font-size: .86rem; color: var(--muted); }
-.bar { display: flex; gap: 3px; height: 2.1rem; margin: .9rem 0 .8rem; border-radius: .5rem; overflow: hidden; }
+.bar { display: flex; gap: 3px; height: 2.2rem; margin: 1rem 0 .9rem; border-radius: 999px; overflow: hidden; }
 .seg { flex-basis: 0; min-width: 2.9rem; display: flex; align-items: center; justify-content: center; gap: .35rem;
   background: var(--c); color: var(--ink); font-size: .82rem; font-weight: 750; white-space: nowrap; overflow: hidden;
   transform-origin: left center; }
@@ -128,7 +134,7 @@ button { font: inherit; color: inherit; }
   border-radius: 999px; cursor: pointer; font-size: .84rem; font-weight: 650;
   color: var(--ct); background: color-mix(in srgb, var(--c) 9%, transparent);
   border: 1px solid color-mix(in srgb, var(--c) 45%, transparent); transition: background .15s, box-shadow .15s; }
-.f[data-f="ALL"] { padding-left: .8rem; --c: var(--gold); --ct: var(--text); }
+.f[data-f="ALL"] { padding-left: .8rem; --c: var(--brand); --ct: var(--text); }
 .f .n { font-variant-numeric: tabular-nums; font-weight: 750; padding: 0 .38rem; border-radius: 999px; min-width: 1.4rem; text-align: center;
   background: color-mix(in srgb, var(--text) 10%, transparent); }
 .f:hover:not(:disabled) { background: color-mix(in srgb, var(--c) 20%, transparent); }
@@ -137,17 +143,17 @@ button { font: inherit; color: inherit; }
 .f[aria-pressed="true"]::after { content: "\2713"; font-size: .72rem; margin-left: -.1rem; }
 .f:disabled { cursor: default; opacity: .62; border-style: dashed; }
 .engine { display: flex; flex-wrap: wrap; align-items: baseline; row-gap: .1rem; margin-top: .9rem; padding-top: .6rem;
-  border-top: 1px solid color-mix(in srgb, var(--gold) 24%, transparent);
-  font: .74rem/1.6 "Source Code Pro", ui-monospace, Consolas, monospace; color: var(--muted); }
-.engine b { color: var(--gold-t); font-weight: 600; letter-spacing: .12em; }
+  border-top: 1px solid color-mix(in srgb, var(--brand) 24%, transparent);
+  font: .74rem/1.6 "JetBrains Mono", ui-monospace, Consolas, monospace; color: var(--muted); }
+.engine b { color: var(--brand-t); font-weight: 600; letter-spacing: .12em; }
 .engine span { white-space: nowrap; }
 .engine i { font-style: normal; opacity: .6; padding: 0 .4rem; }
 
 /* ---------- layout */
 .grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 1.6rem; margin-top: 1.5rem; align-items: start; }
-.panel { border: 1px solid color-mix(in srgb, var(--gold) 30%, var(--line)); border-radius: .75rem; background: var(--panel);
+.panel { border: 1px solid var(--line); border-radius: 1.1rem; background: var(--panel);
   padding: 1rem 1.15rem 1.05rem; box-shadow: var(--shadow); }
-h3 { font-size: 1.05rem; font-weight: 650; letter-spacing: .01em; }
+h3 { font: 700 1.08rem/1.3 "Inter Tight", "Inter", sans-serif; letter-spacing: -.015em; }
 .hint, .key { font-size: .8rem; line-height: 1.45; color: var(--muted); }
 .hint { margin: .25rem 0 .75rem; }
 .key { margin-top: .85rem; }
@@ -162,7 +168,7 @@ h3 { font-size: 1.05rem; font-weight: 650; letter-spacing: .01em; }
 .s.v-NEI .t, .s.v-UNCERTAIN .t { border-bottom-style: dashed; }
 .s:hover .t, .s.lit .t { background: color-mix(in srgb, var(--c) 30%, transparent);
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--c) 70%, transparent); }
-.s:focus-visible { outline: 2px solid var(--gold); }
+.s:focus-visible { outline: 2px solid var(--brand); }
 .s.off .t { background: transparent; border-bottom-color: color-mix(in srgb, var(--text) 25%, transparent); }
 .s.off .mark { filter: grayscale(1); }
 .nw { white-space: nowrap; }
@@ -179,24 +185,24 @@ h3 { font-size: 1.05rem; font-weight: 650; letter-spacing: .01em; }
 .olap { font-size: .78rem; line-height: 1.45; color: var(--muted); margin: .3rem 0 .8rem; }
 mark { color: inherit; background: var(--mark); border-radius: 3px; padding: 0 .08em;
   box-shadow: inset 0 -1px 0 var(--mark-line); }
-.card { position: relative; border: 1px solid var(--line); border-left: 4px solid var(--c); border-radius: .7rem;
+.card { position: relative; border: 1px solid var(--line); border-left: 3px solid var(--c); border-radius: 1rem;
   background: var(--panel); padding: .85rem 1rem .95rem; margin-bottom: .85rem; box-shadow: var(--shadow);
   transition: box-shadow .2s, border-color .2s, background .2s, transform .2s; scroll-margin: 1.2rem; }
 .card[hidden] { display: none; }
 .card.lit { border-color: color-mix(in srgb, var(--c) 70%, var(--line)); border-left-color: var(--c); background: var(--panel2);
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--c) 55%, transparent), 0 0 26px -6px color-mix(in srgb, var(--c) 45%, transparent); }
 .card:focus { outline: none; }
-.card:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+.card:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; }
 .card.flash { animation: flash 1.1s ease-out; }
-@keyframes flash { 0% { box-shadow: 0 0 0 3px var(--gold), 0 0 34px -4px var(--gold); } 100% { box-shadow: var(--shadow); } }
+@keyframes flash { 0% { box-shadow: 0 0 0 3px var(--brand), 0 0 34px -4px var(--brand); } 100% { box-shadow: var(--shadow); } }
 .s.flash .t { animation: sflash 1.1s ease-out; }
-@keyframes sflash { 0% { box-shadow: 0 0 0 2px var(--gold); } 100% { box-shadow: 0 0 0 0 transparent; } }
+@keyframes sflash { 0% { box-shadow: 0 0 0 2px var(--brand); } 100% { box-shadow: 0 0 0 0 transparent; } }
 .card-top { display: flex; align-items: center; justify-content: space-between; gap: .6rem; flex-wrap: wrap; }
 .who { display: flex; align-items: center; gap: .55rem; }
-.num { font: 600 .8rem "Source Code Pro", ui-monospace, Consolas, monospace; color: var(--muted); }
+.num { font: 600 .8rem "JetBrains Mono", ui-monospace, Consolas, monospace; color: var(--muted); }
 .locate { display: inline-flex; align-items: center; gap: .3rem; cursor: pointer; font-size: .78rem; font-weight: 600;
   color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: .12rem .6rem; }
-.locate:hover { color: var(--text); border-color: color-mix(in srgb, var(--gold) 60%, var(--line)); }
+.locate:hover { color: var(--text); border-color: color-mix(in srgb, var(--brand) 60%, var(--line)); }
 .claim { font-size: 1.03rem; font-weight: 600; line-height: 1.45; margin: .55rem 0 .7rem; }
 
 /* confidence: three rows, the 90% cut-off drawn on each */
@@ -233,12 +239,12 @@ summary { cursor: pointer; font-size: .82rem; font-weight: 600; color: var(--mut
 summary:hover { color: var(--text); }
 .none { padding: 1.2rem; text-align: center; color: var(--muted); border: 1px dashed var(--line); border-radius: .7rem; }
 
-/* ---------- reveal: the answer arrives as crimson noise and settles into order */
-.revealing .s:not(.settled) .t { color: var(--crim-t); background: color-mix(in srgb, var(--crim) 10%, transparent);
-  border-bottom-color: color-mix(in srgb, var(--crim) 55%, transparent); border-bottom-style: solid;
-  text-shadow: -1px 0 rgba(224,49,59,.55), 1px 0 rgba(240,181,74,.35); }
+/* ---------- reveal: the answer arrives as scrambled indigo noise and decodes into the verdict view */
+.revealing .s:not(.settled) .t { color: var(--scan-t); background: color-mix(in srgb, var(--scan) 10%, transparent);
+  border-bottom-color: color-mix(in srgb, var(--scan) 55%, transparent); border-bottom-style: solid;
+  text-shadow: -1px 0 rgba(99,102,241,.55), 1px 0 rgba(34,211,238,.4); }
 .revealing .s:not(.settled) .mark { opacity: 0; transform: scale(.6); }
-.revealing .card { opacity: 0; transform: translateY(10px); border-left-color: var(--crim); }
+.revealing .card { opacity: 0; transform: translateY(10px); border-left-color: var(--scan); }
 .revealing .seg { transform: scaleX(0); }
 .revealing .fill { transform: scaleX(0); }
 .s.settled .t { color: inherit; text-shadow: none; transition: color .3s, background .3s, border-color .3s, text-shadow .3s; }
@@ -263,26 +269,10 @@ summary:hover { color: var(--text); }
 }
 """
 
-# Runs in <head>, before the body is parsed: copy the parent page's font faces (same
-# origin, so the iframe matches the app's type) and decide whether to play the reveal.
+# Runs in <head>, before the body is parsed: decide whether to play the reveal.
 REPORT_HEAD_JS = r"""
 (function () {
   var d = document.documentElement;
-  try {
-    var css = [];
-    for (var i = 0; i < parent.document.styleSheets.length; i++) {
-      var ss = parent.document.styleSheets[i], rules;
-      try { rules = ss.cssRules; } catch (e) { continue; }
-      var base = ss.href || parent.location.href;
-      for (var j = 0; j < rules.length; j++) {
-        var r = rules[j];
-        if (r.type !== 5 || !/Source (Sans|Code)/i.test(r.cssText)) continue;
-        css.push(r.cssText.replace(/url\(["']?([^"')]+)["']?\)/g, function (m, u) {
-          try { return 'url("' + new URL(u, base).href + '")'; } catch (e) { return m; } }));
-      }
-    }
-    if (css.length) { var st = document.createElement('style'); st.textContent = css.join('\n'); document.head.appendChild(st); }
-  } catch (e) {}
   var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches, seen = false;
   try { seen = parent.sessionStorage.getItem('verity-seen-__KEY__') === '1'; } catch (e) {}
   if (!reduce && !seen) d.classList.add('revealing');
@@ -468,146 +458,203 @@ REPORT_JS = r"""
 """
 
 # ------------------------------------------------------------------ page + style
-st.set_page_config(page_title="Verity - claim-by-claim answer checker",
+st.set_page_config(page_title="Verity · is this answer actually true?",
                    page_icon=":material/fact_check:", layout="wide",
-                   initial_sidebar_state="auto")
+                   initial_sidebar_state="collapsed")
 
-# Colours are mixed with `currentColor`, so the same rules give light text tints on the
-# dark theme and dark tints on Streamlit's light theme (contrast holds in both).
 CSS = """
 <style>
-/* Theme: an unchecked answer is chaos (crimson, fractured); checked against sources it
-   becomes order (gold, geometric). Crimson and gold are decoration only and never appear
-   on a verdict. Verdicts: green / rose / slate / violet, each with a glyph and a word. */
+/* Theme "scrutiny light": a cold cyan-to-indigo beam passing over the text. The brand
+   gradient is decoration only and never marks a verdict; verdicts keep their own colours
+   (green / rose / slate / amber), each with a glyph and a word. Tints are mixed with
+   `currentColor`, so the same rules hold on Streamlit's light theme. */
 :root {
-  --v-crimson: #e0313b; --v-gold: #f0b54a;
-  --v-ok: #22c55e; --v-bad: #fb7185; --v-nei: #94a3b8; --v-unc: #a78bfa;
+  --v-cyan: #22d3ee; --v-blue: #3b82f6; --v-indigo: #6366f1;
+  --v-grad: linear-gradient(120deg, #67e8f9 0%, #22d3ee 24%, #3b82f6 62%, #818cf8 100%);
+  /* darker stops, so white text stays above 4.5:1 along the whole button */
+  --v-grad-btn: linear-gradient(120deg, #0e7490 0%, #0369a1 38%, #1d4ed8 72%, #4338ca 100%);
+  --v-ok: #34d399; --v-bad: #fb7185; --v-nei: #94a3b8; --v-unc: #fbbf24;
+  --v-ease: cubic-bezier(.16, 1, .3, 1);
 }
-.block-container, [data-testid="stMainBlockContainer"] { padding-top: 4.4rem; max-width: 1240px; }
 .v-SUPPORTED { --c: var(--v-ok); } .v-REFUTED { --c: var(--v-bad); }
 .v-NEI { --c: var(--v-nei); } .v-UNCERTAIN { --c: var(--v-unc); }
-.v-muted { color: color-mix(in srgb, currentColor 72%, transparent); }
-/* crimson haze at the top of the page (chaos), fading out before the results (order) */
+.v-muted { color: color-mix(in srgb, currentColor 66%, transparent); }
+
+/* ---------- page */
+[data-testid="stHeader"] { background: transparent; }
+[data-testid="stSidebarCollapsedControl"] { display: none; }
+.block-container, [data-testid="stMainBlockContainer"] { padding-top: 1.6rem; padding-bottom: 4rem; max-width: 1200px; }
 [data-testid="stMain"] { background:
-  radial-gradient(ellipse 820px 420px at 12% -6%, rgba(200,30,45,.17), transparent 70%),
-  radial-gradient(ellipse 600px 360px at 92% 4%, rgba(200,30,45,.08), transparent 70%); }
+  radial-gradient(1100px 560px at 88% -8%, rgba(59,130,246,.15), transparent 62%),
+  radial-gradient(900px 520px at -8% 6%, rgba(34,211,238,.11), transparent 62%),
+  radial-gradient(800px 600px at 50% 105%, rgba(99,102,241,.08), transparent 60%); }
+/* a faint measuring grid behind the hero, fading out at the edges */
+.v-top { position: relative; }
+.v-top > * { position: relative; z-index: 1; }
+.v-top::before { content: ""; position: absolute; inset: -3rem 0 0; z-index: 0; pointer-events: none;
+  background-image: linear-gradient(color-mix(in srgb, currentColor 5%, transparent) 1px, transparent 1px),
+                    linear-gradient(90deg, color-mix(in srgb, currentColor 5%, transparent) 1px, transparent 1px);
+  background-size: 56px 56px;
+  -webkit-mask-image: radial-gradient(ellipse 70% 80% at 50% 0%, #000 20%, transparent 75%);
+  mask-image: radial-gradient(ellipse 70% 80% at 50% 0%, #000 20%, transparent 75%); }
 
-/* ---------- header: chaos */
-.v-hero { position: relative; padding: .4rem 0 1.1rem; overflow: hidden; }
-.v-hero::before { content: ""; position: absolute; inset: 0; pointer-events: none;
-  background: repeating-linear-gradient(0deg, rgba(224,49,59,.07) 0 1px, transparent 1px 4px);
-  -webkit-mask-image: linear-gradient(90deg, #000 0%, rgba(0,0,0,.5) 45%, transparent 80%);
-  mask-image: linear-gradient(90deg, #000 0%, rgba(0,0,0,.5) 45%, transparent 80%); }
-.v-head { position: relative; display: flex; align-items: center; gap: 1.15rem; }
-.v-core { flex: none; width: 48px; height: 54px; position: relative;
-  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
-  background: linear-gradient(160deg, var(--v-crimson) 0%, #8f1d2a 42%, #b7791f 60%, var(--v-gold) 100%); }
-.v-core::before { content: ""; position: absolute; inset: 2px;
-  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); background: #0d0f13; }
-.v-core::after { content: ""; position: absolute; left: 50%; top: 50%; width: 15px; height: 15px;
-  transform: translate(-50%, -50%) rotate(45deg);
-  background: linear-gradient(135deg, var(--v-crimson), var(--v-gold));
-  box-shadow: 0 0 14px rgba(240,181,74,.55); animation: v-pulse 4s ease-in-out infinite; }
-@keyframes v-pulse { 0%,100% { opacity: .78; } 50% { opacity: 1; } }
-.v-title { font-size: 2.45rem; line-height: 1; font-weight: 800; letter-spacing: .26em; margin: 0; padding: 0;
-  color: #c2410c;   /* solid fallback, readable on both themes */
-  background: linear-gradient(90deg, color-mix(in srgb, var(--v-crimson) 85%, currentColor) 0%,
-              color-mix(in srgb, #e8762e 85%, currentColor) 50%, color-mix(in srgb, var(--v-gold) 80%, currentColor) 100%);
-  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
-  filter: drop-shadow(-1px 0 0 rgba(224,49,59,.35)) drop-shadow(0 0 14px rgba(224,49,59,.22)); }
-.v-tag { font-size: .74rem; letter-spacing: .34em; text-transform: uppercase; margin-top: .5rem;
-  color: color-mix(in srgb, currentColor 75%, transparent); }
-.v-tag b { font-weight: 600; color: color-mix(in srgb, var(--v-crimson) 55%, currentColor); }
-.v-tag i { font-style: normal; font-weight: 600; color: color-mix(in srgb, var(--v-gold) 50%, currentColor); }
-/* fractured edge under the header */
-.v-fracture { height: 7px; margin: .9rem 0 0; opacity: .9;
-  background: linear-gradient(90deg, var(--v-crimson), rgba(224,49,59,.35) 55%, transparent 90%);
-  clip-path: polygon(0 40%, 4% 60%, 9% 20%, 15% 70%, 22% 35%, 27% 55%, 34% 25%, 41% 65%, 47% 40%, 55% 55%,
-    63% 45%, 72% 52%, 82% 48%, 100% 50%, 100% 58%, 82% 56%, 72% 60%, 63% 53%, 55% 64%, 47% 50%, 41% 78%,
-    34% 37%, 27% 68%, 22% 48%, 15% 85%, 9% 34%, 4% 75%, 0 56%); }
-.v-lede { font-size: 1.02rem; margin: 1rem 0 1.2rem 0; max-width: 46rem; }
+/* ---------- top bar */
+.v-nav { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .2rem 0 2.6rem; }
+.v-brand { display: flex; align-items: center; gap: .6rem; font: 800 1.32rem/1 "Inter Tight", "Inter", sans-serif;
+  letter-spacing: -.03em; color: inherit; text-decoration: none; }
+.v-mark { position: relative; flex: none; width: 34px; height: 34px; border-radius: 11px; background: var(--v-grad);
+  box-shadow: 0 0 18px rgba(34,211,238,.35); }
+.v-mark::after { content: ""; position: absolute; left: 11px; top: 8px; width: 8px; height: 15px;
+  border: solid #05060b; border-width: 0 3.5px 3.5px 0; border-radius: 1px; transform: rotate(45deg); }
+.v-links { display: flex; align-items: center; gap: .4rem; flex-wrap: wrap; justify-content: flex-end; }
+.v-links a { font-size: .88rem; font-weight: 550; padding: .45rem .85rem; border-radius: 999px; text-decoration: none;
+  color: color-mix(in srgb, currentColor 75%, transparent); transition: color .2s, background .2s; }
+.v-links a:hover { color: inherit; background: color-mix(in srgb, currentColor 7%, transparent); }
+.v-links a.v-ghost { border: 1px solid color-mix(in srgb, currentColor 16%, transparent); color: inherit; }
 
-/* section labels: chaos steps crimson, order step gold */
-.v-step { font-size: .72rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; margin: .2rem 0 .5rem;
-  color: color-mix(in srgb, var(--v-crimson) 58%, currentColor); }
-.v-step span { color: color-mix(in srgb, currentColor 60%, transparent); font-weight: 600; margin-right: .5rem; }
-.v-step.v-order { color: color-mix(in srgb, var(--v-gold) 52%, currentColor); display: flex; align-items: center; gap: .55rem; }
-.v-hex { display: inline-block; width: .8rem; height: .9rem; background: var(--v-gold);
-  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); }
-.v-h { font-size: 1.05rem; font-weight: 650; margin: .2rem 0 .7rem; letter-spacing: .01em; }
+/* ---------- hero */
+.v-hero { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); gap: 3rem; align-items: center;
+  padding-bottom: 3.2rem; }
+.v-pill { display: inline-flex; align-items: center; gap: .55rem; padding: .38rem .9rem .38rem .7rem; border-radius: 999px;
+  font-size: .82rem; font-weight: 600; border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+  background: color-mix(in srgb, currentColor 4%, transparent); }
+.v-pill i { width: .5rem; height: .5rem; border-radius: 50%; background: var(--v-cyan);
+  box-shadow: 0 0 0 4px rgba(34,211,238,.16), 0 0 12px var(--v-cyan); }
+.v-h1 { font: 800 clamp(2.6rem, 5.6vw, 4.5rem)/1.02 "Inter Tight", "Inter", sans-serif; letter-spacing: -.032em;
+  margin: 1.2rem 0 1.1rem; padding: 0; }
+/* stops mixed with the text colour: paler on the dark theme, deeper (readable) on the light one */
+.v-grad-text { background: linear-gradient(120deg, color-mix(in srgb, #22d3ee 78%, currentColor) 0%,
+    color-mix(in srgb, #3b82f6 86%, currentColor) 62%, color-mix(in srgb, #818cf8 86%, currentColor) 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: var(--v-blue); padding-right: .04em; }
+.v-lede { font-size: clamp(1.02rem, 1.3vw, 1.16rem); line-height: 1.62; max-width: 36rem; margin: 0;
+  color: color-mix(in srgb, currentColor 74%, transparent); }
+.v-stats { display: flex; flex-wrap: wrap; gap: 1.6rem 2.4rem; margin-top: 2rem; }
+.v-stat b { display: block; font: 750 1.55rem/1 "Inter Tight", "Inter", sans-serif; letter-spacing: -.03em; }
+.v-stat span { display: block; margin-top: .4rem; font-size: .8rem; color: color-mix(in srgb, currentColor 62%, transparent); }
 
-/* primary button: crimson resolving to amber; white text passes contrast on both ends */
-button[kind="primary"], [data-testid="stBaseButton-primary"] {
-  background: linear-gradient(90deg, #8e1622 0%, #a4321c 50%, #a45a0c 100%) !important; color: #fff !important;
-  border: 1px solid rgba(240,181,74,.45) !important; letter-spacing: .06em; min-height: 2.9rem;
-  box-shadow: 0 0 0 1px rgba(224,49,59,.12), 0 6px 22px -6px rgba(224,49,59,.45); }
-button[kind="primary"] p, [data-testid="stBaseButton-primary"] p { color: #fff !important; font-weight: 700; }
-button[kind="primary"]:hover, [data-testid="stBaseButton-primary"]:hover {
-  border-color: var(--v-gold) !important; box-shadow: 0 0 0 1px rgba(240,181,74,.3), 0 6px 26px -4px rgba(240,181,74,.4); }
-button[kind="primary"]:focus-visible, [data-testid="stBaseButton-primary"]:focus-visible {
-  outline: 2px solid var(--v-gold); outline-offset: 2px; }
+/* the sample report beside the headline: what a checked answer looks like */
+.v-demo { position: relative; border-radius: 1.4rem; padding: 1.3rem 1.3rem 1.1rem;
+  background: color-mix(in srgb, currentColor 3.5%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  box-shadow: 0 0 0 1px rgba(34,211,238,.10), 0 30px 80px -30px rgba(59,130,246,.45); overflow: hidden; }
+.v-demo::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 2px; background: var(--v-grad); }
+.v-demo::after { content: ""; position: absolute; left: 0; right: 0; top: -40%; height: 40%; pointer-events: none;
+  background: linear-gradient(180deg, transparent, rgba(34,211,238,.10), transparent);
+  animation: v-beam 5.5s var(--v-ease) infinite; }
+@keyframes v-beam { 0% { top: -40%; } 60%, 100% { top: 110%; } }
+.v-demo-h { display: flex; justify-content: space-between; align-items: center; font-size: .72rem; font-weight: 700;
+  letter-spacing: .16em; text-transform: uppercase; color: color-mix(in srgb, currentColor 58%, transparent); margin-bottom: .9rem; }
+.v-demo-h em { font-style: normal; letter-spacing: .04em; text-transform: none; font-weight: 600; }
+.v-demo-row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: .75rem;
+  padding: .72rem .8rem; border-radius: .85rem; margin-bottom: .5rem;
+  background: color-mix(in srgb, var(--c) 7%, transparent); border: 1px solid color-mix(in srgb, var(--c) 22%, transparent); }
+.v-demo-row p { margin: 0; font-size: .92rem; line-height: 1.35; }
+.v-demo-row small { font-size: .76rem; font-weight: 700; font-variant-numeric: tabular-nums;
+  color: color-mix(in srgb, var(--c) 60%, currentColor); }
+.v-demo-foot { font-size: .76rem; margin-top: .7rem; color: color-mix(in srgb, currentColor 55%, transparent); }
 
-/* panels */
-.v-panel { border: 1px solid color-mix(in srgb, currentColor 16%, transparent); border-radius: .7rem;
-  background: color-mix(in srgb, currentColor 3.5%, transparent); padding: 1rem 1.15rem; }
-.v-order-panel { border-color: color-mix(in srgb, var(--v-gold) 30%, transparent); }
-.v-empty { border-style: dashed; padding: 1.3rem 1.4rem; border-color: color-mix(in srgb, var(--v-gold) 35%, transparent); }
-.v-empty p { margin: .2rem 0 .75rem; }
+/* ---------- section labels */
+.v-sec { display: flex; align-items: center; gap: .7rem; margin: .3rem 0 .9rem; }
+.v-sec b { display: inline-flex; align-items: center; justify-content: center; width: 1.9rem; height: 1.9rem; border-radius: .6rem;
+  font: 700 .78rem/1 "JetBrains Mono", ui-monospace, monospace; color: #04131a; background: var(--v-grad); }
+.v-sec span { font: 700 1.12rem/1.2 "Inter Tight", "Inter", sans-serif; letter-spacing: -.015em; }
+.v-sec small { margin-left: auto; font-size: .8rem; color: color-mix(in srgb, currentColor 58%, transparent); }
+.v-eyebrow { font-size: .74rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase;
+  color: color-mix(in srgb, currentColor 58%, transparent); margin: 0 0 .6rem; }
+.v-h2 { font: 750 clamp(1.7rem, 3.2vw, 2.4rem)/1.1 "Inter Tight", "Inter", sans-serif; letter-spacing: -.026em; margin: 0 0 .5rem; padding: 0; }
 
-/* the merge: crimson resolving into gold, with a diamond at the seam */
-.v-merge { position: relative; height: 2px; margin: 2rem 0 1.4rem; border: 0;
-  background: linear-gradient(90deg, rgba(224,49,59,0) 0%, var(--v-crimson) 18%, #e8762e 50%, var(--v-gold) 82%, rgba(240,181,74,0) 100%); }
-.v-merge::after { content: ""; position: absolute; left: 50%; top: 50%; width: 11px; height: 11px;
-  transform: translate(-50%, -50%) rotate(45deg); background: var(--v-gold);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--v-gold) 18%, transparent), 0 0 14px rgba(240,181,74,.6); }
+/* ---------- input cards (keyed Streamlit containers) */
+.st-key-card_answer, .st-key-card_sources {
+  border-radius: 1.3rem; padding: 1.25rem 1.3rem 1.1rem;
+  background: color-mix(in srgb, currentColor 3.2%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  box-shadow: 0 24px 60px -36px rgba(0,0,0,.7); }
+[class*="st-key-src_box_"] { border-radius: 1rem; padding: .8rem .9rem .7rem;
+  background: color-mix(in srgb, currentColor 2.5%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 9%, transparent); }
+[data-baseweb="textarea"], [data-baseweb="input"] { border-radius: .85rem !important; }
+[data-baseweb="textarea"]:focus-within, [data-baseweb="input"]:focus-within {
+  border-color: var(--v-cyan) !important; box-shadow: 0 0 0 3px rgba(34,211,238,.16); }
+[data-testid="stFileUploaderDropzone"] { border-radius: .95rem; }
 
-/* verdict chip */
-.v-chip { display: inline-flex; align-items: center; gap: .38rem; padding: .14rem .6rem .14rem .3rem;
-  border-radius: 999px; font-size: .78rem; font-weight: 650; letter-spacing: .02em; white-space: nowrap;
-  color: color-mix(in srgb, var(--c) 52%, currentColor);
-  background: color-mix(in srgb, var(--c) 14%, transparent);
-  border: 1px solid color-mix(in srgb, var(--c) 50%, transparent); }
-.v-ico { display: inline-flex; align-items: center; justify-content: center; width: 1.15rem; height: 1.15rem;
-  border-radius: 50%; font-size: .72rem; font-weight: 800; background: var(--c); color: #0a0c0f; line-height: 1; }
+/* ---------- buttons */
+[data-testid="stBaseButton-primary"] { background: var(--v-grad-btn) !important; color: #fff !important; border: 0 !important;
+  min-height: 3.2rem; box-shadow: 0 0 0 1px rgba(99,102,241,.35), 0 18px 50px -18px rgba(37,99,235,.65);
+  transition: transform .2s var(--v-ease), filter .2s; }
+[data-testid="stBaseButton-primary"] p { color: #fff !important; font-weight: 700; font-size: 1.02rem; letter-spacing: .01em; }
+[data-testid="stBaseButton-primary"]:hover { transform: translateY(-1px); filter: brightness(1.12); }
+[data-testid="stBaseButton-primary"]:focus-visible { outline: 2px solid var(--v-cyan); outline-offset: 3px; }
+[data-testid="stBaseButton-secondary"] { min-height: 3.2rem; }
+[data-testid="stBaseButton-secondary"]:hover { border-color: color-mix(in srgb, var(--v-cyan) 60%, transparent); }
+.st-key-src_actions [data-testid="stBaseButton-secondary"] { min-height: 2.5rem; }
+[data-testid="stBaseButton-tertiary"] { color: color-mix(in srgb, currentColor 62%, transparent); }
+[data-testid="stBaseButton-tertiary"]:hover { color: var(--v-cyan); }
+
+/* ---------- verdict chips */
+.v-chip { display: inline-flex; align-items: center; gap: .38rem; padding: .16rem .62rem .16rem .3rem;
+  border-radius: 999px; font-size: .78rem; font-weight: 650; white-space: nowrap;
+  color: color-mix(in srgb, var(--c) 58%, currentColor);
+  background: color-mix(in srgb, var(--c) 12%, transparent); border: 1px solid color-mix(in srgb, var(--c) 42%, transparent); }
+.v-ico { display: inline-flex; align-items: center; justify-content: center; width: 1.15rem; height: 1.15rem; flex: none;
+  border-radius: 50%; font-size: .72rem; font-weight: 800; background: var(--c); color: #06080f; line-height: 1; }
 .v-legend { display: flex; flex-wrap: wrap; gap: .45rem .55rem; }
 
-/* checking: the scan line runs from crimson into gold */
-.v-scan { position: relative; height: 3px; overflow: hidden; border-radius: 2px;
-  background: linear-gradient(90deg, rgba(224,49,59,.18), rgba(240,181,74,.18)); margin: .6rem 0 .3rem; }
-.v-scan::after { content: ""; position: absolute; top: 0; left: -35%; width: 35%; height: 100%;
-  background: linear-gradient(90deg, transparent, var(--v-crimson), var(--v-gold), transparent);
-  box-shadow: 0 0 10px rgba(240,181,74,.6); animation: v-sweep 1.6s ease-in-out infinite; }
+/* ---------- empty report + checking */
+.v-panel { border-radius: 1.2rem; padding: 1.2rem 1.3rem;
+  background: color-mix(in srgb, currentColor 3%, transparent); border: 1px solid color-mix(in srgb, currentColor 10%, transparent); }
+.v-panel h4 { font: 700 1.05rem/1.3 "Inter Tight", "Inter", sans-serif; margin: 0 0 .4rem; padding: 0; }
+.v-panel p { margin: 0 0 .5rem; }
+.v-empty { border-style: dashed; text-align: center; padding: 2rem 1.4rem; }
+.v-empty .v-legend { justify-content: center; }
+.v-empty p { margin: 0 auto .9rem; max-width: 34rem; }
+.v-scan { position: relative; height: 3px; overflow: hidden; border-radius: 2px; margin: .7rem 0 .2rem;
+  background: color-mix(in srgb, var(--v-cyan) 16%, transparent); }
+.v-scan::after { content: ""; position: absolute; top: 0; left: -35%; width: 35%; height: 100%; background: var(--v-grad);
+  box-shadow: 0 0 12px rgba(34,211,238,.7); animation: v-sweep 1.4s ease-in-out infinite; }
 @keyframes v-sweep { from { left: -35%; } to { left: 100%; } }
-.v-scan-label { font-size: .78rem; letter-spacing: .18em; text-transform: uppercase;
-  color: color-mix(in srgb, var(--v-crimson) 55%, currentColor); }
-@media (prefers-reduced-motion: reduce) { .v-scan::after, .v-core::after { animation: none; } .v-scan::after { left: 32%; } }
+.v-scan-label { font-size: .8rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase;
+  color: color-mix(in srgb, var(--v-cyan) 65%, currentColor); }
+.v-rule { height: 1px; border: 0; margin: 2.8rem 0 2.4rem;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, currentColor 16%, transparent), transparent); }
 
-/* sidebar: the pipeline runs from chaos (crimson) to order (gold) */
-.v-side-h { font-size: .7rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; margin: .4rem 0 .6rem;
-  color: color-mix(in srgb, currentColor 78%, transparent); }
-.v-steps { list-style: none; padding: 0; margin: 0 0 1.2rem; }
-.v-steps li { position: relative; padding: 0 0 .85rem 2.2rem; margin: 0; font-size: .86rem; line-height: 1.45; }
-.v-steps li::before { content: attr(data-n); position: absolute; left: 0; top: .05rem; width: 1.45rem; height: 1.45rem;
-  display: flex; align-items: center; justify-content: center; font-size: .72rem; font-weight: 700;
-  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
-  background: color-mix(in srgb, var(--k) 22%, transparent); color: color-mix(in srgb, var(--k) 55%, currentColor); }
-.v-steps li:not(:last-child)::after { content: ""; position: absolute; left: .72rem; top: 1.6rem; bottom: .15rem;
-  width: 1px; background: linear-gradient(var(--k), var(--k2)); opacity: .45; }
-.v-steps b { font-weight: 650; }
-.v-defs { margin: 0 0 1.2rem; font-size: .84rem; line-height: 1.45; }
-.v-defs div { margin-bottom: .6rem; }
-.v-defs .v-chip { margin-bottom: .2rem; }
-.v-limits { font-size: .8rem; line-height: 1.5; padding-left: 1.1rem; margin: 0;
-  color: color-mix(in srgb, currentColor 78%, transparent); }
-.v-limits li { margin-bottom: .35rem; }
+/* ---------- how it works, verdicts, limits */
+.v-steps { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .8rem; margin: 1.2rem 0 0; padding: 0; list-style: none; }
+.v-steps li, .v-defs > div { border-radius: 1.1rem; padding: 1rem 1rem 1.05rem; margin: 0;
+  background: color-mix(in srgb, currentColor 3%, transparent); border: 1px solid color-mix(in srgb, currentColor 9%, transparent);
+  font-size: .87rem; line-height: 1.5; color: color-mix(in srgb, currentColor 78%, transparent); }
+.v-steps li b, .v-defs b { display: block; font: 700 1rem/1.25 "Inter Tight", "Inter", sans-serif; margin: .7rem 0 .35rem;
+  letter-spacing: -.01em; }
+.v-steps .v-n { display: inline-flex; align-items: center; justify-content: center; width: 2rem; height: 2rem; border-radius: .65rem;
+  font: 700 .8rem/1 "JetBrains Mono", ui-monospace, monospace; color: #04131a; background: var(--v-grad); }
+.v-defs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .8rem; margin-top: 1.2rem; }
+.v-defs > div { border-top: 2px solid var(--c); }
+.v-defs p { margin: .7rem 0 0; }
+.v-limits { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem 2rem; padding: 0; margin: 1rem 0 1.6rem; list-style: none; }
+.v-limits li { position: relative; padding-left: 1.3rem; font-size: .9rem; line-height: 1.55;
+  color: color-mix(in srgb, currentColor 76%, transparent); }
+.v-limits li::before { content: ""; position: absolute; left: 0; top: .58rem; width: .45rem; height: .45rem; border-radius: 50%;
+  background: var(--v-grad); }
+.v-foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .6rem 1.2rem; margin-top: 3rem; padding-top: 1.3rem;
+  border-top: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  font-size: .82rem; color: color-mix(in srgb, currentColor 58%, transparent); }
+.v-foot a { color: inherit; }
+[data-testid="stExpander"] details { border-radius: 1.1rem; }
 
-@media (max-width: 640px) {
-  .block-container, [data-testid="stMainBlockContainer"] { padding-top: 3.6rem; }
-  .v-title { font-size: 1.9rem; letter-spacing: .2em; }
-  .v-tag { letter-spacing: .2em; font-size: .66rem; }
-  .v-core { width: 40px; height: 45px; }
-  [data-testid="stButtonGroup"] button { padding-left: .6rem; padding-right: .6rem; }
+@media (max-width: 980px) {
+  .v-hero { grid-template-columns: minmax(0, 1fr); gap: 2rem; }
+  .v-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .v-defs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+@media (max-width: 640px) {
+  .block-container, [data-testid="stMainBlockContainer"] { padding-top: 1rem; }
+  .v-nav { padding: 0 2.2rem 1.6rem 0; }       /* clear of Streamlit's menu button */
+  .v-links a:not(.v-ghost) { display: none; }
+  .v-steps, .v-defs, .v-limits { grid-template-columns: minmax(0, 1fr); }
+  .v-stats { gap: 1.2rem 1.6rem; }
+  .st-key-card_answer, .st-key-card_sources { padding: 1rem .95rem .9rem; }
+}
+@media (prefers-reduced-motion: reduce) { .v-demo::after, .v-scan::after { animation: none; } .v-scan::after { left: 32%; } }
 </style>
 """
 st.html(CSS)
@@ -717,45 +764,19 @@ def headline(counts: dict, n: int) -> str:
 
 # ------------------------------------------------------------------ report component
 # The report is one self-contained HTML/CSS/JS document rendered in an iframe by
-# components.html: no external scripts, fonts or URLs. The Python side builds all markup
-# (so it reads correctly even before the script runs); the script only adds behaviour:
+# components.html: no external scripts or URLs apart from the page's web fonts. The Python
+# side builds all markup (so it reads correctly even before the script runs); the script only adds behaviour:
 # linked highlighting, filters, the reveal, theme sync and sizing the iframe to its content.
-
-STOPWORDS = frozenset("""
-a about above after again against all also am an and any are as at be been before being below
-between both but by can could did do does doing down during each few for from further had has
-have having he her here hers him his how i if in into is it its itself just may me might more
-most much must my no nor not now of off on once only or other our ours out over own same she
-should so some such than that the their theirs them then there these they this those through
-to too under until up upon us very was we were what when where which while who whom why will
-with would you your yours yet via per its one""".split())
-_WORD = re.compile(r"[^\W_]+(?:'[^\W_]+)?")
-
-
-def _stem(w: str) -> str:
-    """Lower-case and strip a few English endings, so 'moons' meets 'moon'."""
-    w = w.lower()
-    if w.endswith("'s"):
-        w = w[:-2]
-    for suf, keep in (("ing", 4), ("ies", 3), ("ed", 3), ("es", 3), ("s", 3)):
-        if w.endswith(suf) and len(w) - len(suf) >= keep and not w.endswith("ss"):
-            return w[: -len(suf)] + ("y" if suf == "ies" else "")
-    return w
-
-
-def _content_words(text: str) -> set[str]:
-    return {_stem(m.group()) for m in _WORD.finditer(text) if m.group().lower() not in STOPWORDS}
-
 
 def overlap_marked(passage: str, claim: str) -> tuple[str, int]:
     """The passage, escaped, with every word it shares with the claim wrapped in <mark>
     (normalised word overlap, stopwords removed). Adjacent shared words share one mark.
     Returns the HTML and the number of distinct shared words."""
-    want = _content_words(claim)
+    want = content_words(claim)
     out, pos, run_open, shared = [], 0, False, set()
-    for m in _WORD.finditer(passage):
+    for m in WORD.finditer(passage):
         w = m.group()
-        hit = w.lower() not in STOPWORDS and _stem(w) in want
+        hit = w.lower() not in STOPWORDS and stem(w) in want
         gap = passage[pos:m.start()]
         if run_open and not (hit and gap.isspace()):
             out.append("</mark>")
@@ -765,7 +786,7 @@ def overlap_marked(passage: str, claim: str) -> tuple[str, int]:
             out.append("<mark>")
             run_open = True
         if hit:
-            shared.add(_stem(w))
+            shared.add(stem(w))
         out.append(esc(w))
         pos = m.end()
     if run_open:
@@ -814,9 +835,24 @@ def _glued(text: str, marks: str) -> str:
     return f'{head}<span class="nw"><span class="t last">{esc(text[k:])}</span>{marks}</span>'
 
 
+def _sentence_el(text: str, items: list[tuple[int, str]]) -> str:
+    """One focusable piece of the answer, tinted by its worst verdict and followed by one
+    marker (claim number + glyph) per claim it holds. Surrounding spaces stay outside."""
+    body = text.strip()
+    lead, trail = text[:len(text) - len(text.lstrip())], text[len(text.rstrip()):]
+    worst = max((v for _, v in items), key=SEVERITY.get)
+    ids = " ".join(str(i) for i, _ in items)
+    who = ", ".join(f"claim {i} {NAMES[v]}" for i, v in items)
+    marks = "".join(f'<span class="mark v-{v}" aria-hidden="true">{_ico(v)}{i}</span>' for i, v in items)
+    return (f'{esc(lead)}<span class="s v-{worst}" role="button" tabindex="0" data-claims="{ids}" '
+            f'aria-label="{esc(body)} ({who}). Press Enter to open the claim.">'
+            f'{_glued(body, marks)}</span>{esc(trail)}')
+
+
 def _answer_html(answer: str, claims) -> str:
-    """The answer, each checked sentence a focusable button tinted by its worst verdict and
-    followed by one marker (claim number + glyph) per claim it holds."""
+    """The answer, sentence by sentence. A sentence the LLM split into several claims is
+    coloured part by part when its parts can be told apart (verity.text.claim_parts);
+    otherwise the whole sentence takes its worst verdict."""
     spans: dict[tuple[int, int], list[tuple[int, str]]] = {}
     for i, c in enumerate(claims, 1):
         spans.setdefault((c.start, c.end), []).append((i, c.verdict))
@@ -824,14 +860,17 @@ def _answer_html(answer: str, claims) -> str:
     for (a, e), items in sorted(spans.items()):
         if a < pos:                       # overlapping span: skip rather than duplicate text
             continue
-        worst = max((v for _, v in items), key=SEVERITY.get)
         out.append(esc(answer[pos:a]))
-        ids = " ".join(str(i) for i, _ in items)
-        who = ", ".join(f"claim {i} {NAMES[v]}" for i, v in items)
-        marks = "".join(f'<span class="mark v-{v}" aria-hidden="true">{_ico(v)}{i}</span>' for i, v in items)
-        out.append(f'<span class="s v-{worst}" role="button" tabindex="0" data-claims="{ids}" '
-                   f'aria-label="{esc(answer[a:e])} ({who}). Press Enter to open the claim.">'
-                   f'{_glued(answer[a:e], marks)}</span>')
+        text = answer[a:e]
+        parts = claim_parts(text, [claims[i - 1].claim for i, _ in items]) if len(items) > 1 else []
+        if parts:
+            placed = {j for _, _, j in parts}
+            orphans = [it for j, it in enumerate(items) if j not in placed]   # marked at the end
+            for k, (pa, pe, j) in enumerate(parts):
+                own = [items[j]] + (orphans if k == len(parts) - 1 else [])
+                out.append(_sentence_el(text[pa:pe], own))
+        else:
+            out.append(_sentence_el(text, items))
         pos = e
     out.append(esc(answer[pos:]))
     return "".join(out).replace("\n", "<br>")
@@ -921,7 +960,8 @@ def report_component(report, eng: dict, theme: str) -> tuple[str, int]:
         f'<p class="hint">Hover or tab to a sentence to light up its claim; click or press Enter to jump to it.</p>'
         f'<div class="answer" id="answer">{_answer_html(report.answer, claims)}</div>'
         f'<p class="key">Markers show the claim number and its verdict symbol. Underlines: solid for '
-        f'supported, double for refuted, dashed for unsettled.</p></section>'
+        f'supported, double for refuted, dashed for unsettled. A sentence split into several claims '
+        f'is coloured part by part.</p></section>'
         f'<section class="cards" aria-labelledby="ch"><div class="cards-h"><h3 id="ch">Claims</h3>'
         f'<span class="status" id="status" aria-live="polite">Showing all {n}</span></div>'
         f'<p class="olap"><mark>Highlighted words</mark> appear in both the claim and the passage. '
@@ -930,7 +970,7 @@ def report_component(report, eng: dict, theme: str) -> tuple[str, int]:
         + '<p class="none" id="none" hidden>No claims with this verdict.</p></section></div></div>')
     doc = (f'<!doctype html><html lang="en" data-theme="{theme}"><head><meta charset="utf-8">'
            f'<meta name="viewport" content="width=device-width,initial-scale=1">'
-           f'<style>{REPORT_CSS}</style><script>{REPORT_HEAD_JS.replace("__KEY__", key)}</script></head>'
+           f'<link rel="stylesheet" href="{REPORT_FONTS}"><style>{REPORT_CSS}</style><script>{REPORT_HEAD_JS.replace("__KEY__", key)}</script></head>'
            f'<body>{body}<script>{REPORT_JS}</script></body></html>')
     # first guess only: header + the taller column (cards on wide screens)
     guess = 300 + sum(330 + 90 * (len(c.evidence) > 1) + len(c.claim) // 2 for c in claims)
@@ -941,6 +981,7 @@ def report_component(report, eng: dict, theme: str) -> tuple[str, int]:
 st.session_state.setdefault("n_sources", 1)
 st.session_state.setdefault("source_mode", SRC_PASTE)
 st.session_state.setdefault("answer", "")
+st.session_state.setdefault("upload_gen", 0)       # bumped to empty the file uploader
 # keep source fields alive while their widgets are hidden (SciFact mode)
 for _k in [k for k in st.session_state if str(k).startswith("src_")]:
     st.session_state[_k] = st.session_state[_k]
@@ -972,54 +1013,65 @@ def remove_source():
     st.session_state.n_sources = max(1, st.session_state.n_sources - 1)
 
 
-# ------------------------------------------------------------------ sidebar
-with st.sidebar:
-    st.html(
-        '<div class="v-side-h">How it works</div><ol class="v-steps">'
-        '<li data-n="1" style="--k:#e0313b;--k2:#e4553a"><b>Decompose.</b> Split the answer into claims: one per sentence, or an LLM '
-        'rewrites sentences into single-fact claims.</li>'
-        '<li data-n="2" style="--k:#e4553a;--k2:#e8762e"><b>Retrieve.</b> Find the passages most likely to settle each claim '
-        '(BM25 keyword search combined with embeddings).</li>'
-        '<li data-n="3" style="--k:#e8762e;--k2:#ec963c"><b>Window.</b> Cut the evidence into overlapping 2-sentence '
-        'windows, so each passage the verifier reads stays short and specific.</li>'
-        '<li data-n="4" style="--k:#ec963c;--k2:#f0b54a"><b>Verify.</b> A natural-language-inference model scores every '
-        '(evidence, claim) pair as supported, refuted or not enough evidence.</li>'
-        '<li data-n="5" style="--k:#f0b54a;--k2:#f0b54a"><b>Decide.</b> The passage with the strongest supporting or refuting score '
-        'wins; conformal prediction turns its calibrated probabilities into a verdict, or '
-        '<i>Uncertain</i>.</li></ol>'
-        '<div class="v-side-h">Verdicts</div><div class="v-defs">'
-        f'<div>{chip("SUPPORTED")}<br>The evidence states or implies the claim.</div>'
-        f'<div>{chip("REFUTED")}<br>The evidence contradicts the claim.</div>'
-        f'<div>{chip("NEI")}<br>The sources do not settle it either way. Not the same as false.</div>'
-        f'<div>{chip("UNCERTAIN")}<br>At the calibrated 90% coverage level the verifier could not '
-        'narrow it to one label; the card lists the labels it could not rule out.</div></div>'
-        '<div class="v-side-h">One verifier</div><div class="v-defs">'
-        '<div><b>Pasted sources</b> are cut into 2-sentence windows.</div>'
-        '<div><b>SciFact corpus</b>: Verity first finds the 3 most relevant abstracts, then checks '
-        'every 2-sentence window inside them.</div>'
-        '<div>Both use the fine-tuned verifier with its own calibration. The SciFact design was chosen on '
-        'held-out claims; pasted sources are cut the same way.</div></div>'
-        '<div class="v-side-h">Limits</div><ul class="v-limits">'
-        '<li>It judges only against the sources given. If they are wrong, Verity agrees with them.</li>'
-        '<li>The 90% target is a long-run rate, calibrated on annotated evidence for science claims. '
-        'It is not a promise about any single claim, and on retrieved evidence or other kinds of '
-        'text the measured rate is lower (see the results).</li>'
-        '<li>The fine-tuned verifier leans towards "not enough evidence" on true claims.</li>'
-        '<li>Long sources are cut into two-sentence windows, so claims that need far-apart facts '
-        'can be missed.</li>'
-        '<li>Read the cited evidence before relying on a verdict.</li></ul>')
+def clear_answer():
+    st.session_state.answer = ""
+    st.session_state.pop("report", None)
 
-# ------------------------------------------------------------------ header
-st.html('<header class="v-hero"><div class="v-head"><div class="v-core" aria-hidden="true"></div><div>'
-        '<h1 class="v-title">VERITY</h1><div class="v-tag"><b>No strings.</b> <i>Only sources.</i></div>'
-        '</div></div><div class="v-fracture" aria-hidden="true"></div></header><p class="v-lede">Check an AI-written answer claim by claim against the '
-        'sources it should agree with. Every verdict comes with the passage that decided it.</p>')
+
+def clear_source(i: int):
+    st.session_state[f"src_name_{i}"] = f"source {i + 1}"
+    st.session_state[f"src_text_{i}"] = ""
+
+
+def clear_all():
+    clear_answer()
+    for i in range(MAX_SOURCES):
+        clear_source(i)
+    st.session_state.n_sources = 1
+    st.session_state.upload_gen += 1
+
+
+# ------------------------------------------------------------------ top bar + hero
+LOGO = '<span class="v-mark" aria-hidden="true"></span>'     # drawn in CSS: st.html drops inline SVG
+GITHUB, MODEL_HUB = "https://github.com/RuhinzGH/Verity", "https://huggingface.co/RuhinZ/verity-deberta-scifact"
+
+
+def demo_row(v: str, text: str, p: str) -> str:
+    return (f'<div class="v-demo-row v-{v}"><span class="v-ico" aria-hidden="true">{GLYPH[v]}</span>'
+            f'<p>{text}</p><small>{SHORT[v]} &middot; {p}</small></div>')
+
+
+st.html(
+    f'<div class="v-top"><nav class="v-nav"><a class="v-brand" href="#check" aria-label="Verity">{LOGO}Verity</a>'
+    '<div class="v-links"><a href="#how">How it works</a><a href="#limits">Limits</a>'
+    f'<a href="{MODEL_HUB}" target="_blank" rel="noopener">Model</a>'
+    f'<a class="v-ghost" href="{GITHUB}" target="_blank" rel="noopener">GitHub</a></div></nav>'
+    '<section class="v-hero"><div>'
+    '<span class="v-pill"><i aria-hidden="true"></i>No strings. Only sources.</span>'
+    '<h1 class="v-h1">Is this answer<br><span class="v-grad-text">actually true?</span></h1>'
+    '<p class="v-lede">Verity checks an AI-written answer claim by claim against the sources it should agree '
+    'with, and shows the exact passage behind every verdict. When the evidence is not strong enough, '
+    'it says so instead of guessing.</p>'
+    '<div class="v-stats"><div class="v-stat"><b>0.786</b><span>verifier macro-F1, SciFact</span></div>'
+    '<div class="v-stat"><b>5,183</b><span>science abstracts to search</span></div>'
+    '<div class="v-stat"><b>90%</b><span>calibrated uncertainty target</span></div></div></div>'
+    '<div class="v-demo" aria-label="Example of a checked answer"><div class="v-demo-h"><span>Sample report</span>'
+    '<em>real verdicts from the examples</em></div>'
+    + demo_row("SUPPORTED", "Jupiter is the largest planet in the Solar System.", "96%")
+    + demo_row("REFUTED", "Mars is the third planet from the Sun.", "93%")
+    + demo_row("NEI", "Saturn&rsquo;s rings are made mostly of water ice.", "96%")
+    + demo_row("UNCERTAIN", "Vitamin D prevents all fractures in older adults.", "2 labels")
+    + '<p class="v-demo-foot">Press <b>Planets</b> or <b>Smoking (SciFact)</b> below to run these yourself.</p></div></section></div>')
 
 # ------------------------------------------------------------------ inputs
+st.html('<div id="check"></div>')
 col_a, col_s = st.columns([1.1, 1], gap="large")
 
-with col_a:
-    st.html('<div class="v-step"><span>01</span>The answer</div>')
+with col_a, st.container(key="card_answer"):
+    h, c = st.columns([4, 1], vertical_alignment="center")
+    h.html('<div class="v-sec"><b>01</b><span>The answer</span></div>')
+    c.button("Clear", key="clear_answer", type="tertiary", icon=":material/backspace:", on_click=clear_answer,
+             help="Empty the answer box.")
     st.pills("Load an example", list(EXAMPLES), key="example_pick", on_change=load_example,
              help="Each of the first three examples has one claim the sources contradict and one "
                   "they do not cover. The SciFact example searches the science corpus.")
@@ -1035,28 +1087,31 @@ with col_a:
         st.caption("The answer text will be sent to the Groq API to be split into claims.")
 
 sources: list[tuple[str, str]] = []
-with col_s:
-    st.html('<div class="v-step"><span>02</span>The sources</div>')
+with col_s, st.container(key="card_sources"):
+    st.html('<div class="v-sec"><b>02</b><span>The sources</span></div>')
     mode = st.radio("Check against", [SRC_PASTE, SRC_SCIFACT], key="source_mode", horizontal=True)
     if mode == SRC_PASTE:
         for i in range(int(st.session_state.n_sources)):
             st.session_state.setdefault(f"src_name_{i}", f"source {i + 1}")
-            with st.container(border=True):
-                st.text_input(f"Source {i + 1} name", key=f"src_name_{i}",
-                              placeholder="File name or title")
+            with st.container(key=f"src_box_{i}"):
+                n, c = st.columns([4, 1], vertical_alignment="bottom")
+                n.text_input(f"Source {i + 1} name", key=f"src_name_{i}", placeholder="File name or title")
+                c.button("Clear", key=f"clear_src_{i}", type="tertiary", icon=":material/backspace:",
+                         on_click=clear_source, args=(i,), help=f"Empty source {i + 1}.")
                 st.text_area(f"Source {i + 1} text", key=f"src_text_{i}", height=96,
                              label_visibility="collapsed",
                              placeholder="Paste the text this answer should agree with ...")
             text = st.session_state.get(f"src_text_{i}", "").strip()
             if text:
                 sources.append((st.session_state[f"src_name_{i}"].strip() or f"source {i + 1}", text))
-        b1, b2 = st.columns(2)
-        b1.button("Add source", icon=":material/add:", on_click=add_source, width="stretch",
-                  disabled=st.session_state.n_sources >= MAX_SOURCES)
-        b2.button("Remove last", icon=":material/remove:", on_click=remove_source, width="stretch",
-                  disabled=st.session_state.n_sources <= 1)
+        with st.container(key="src_actions"):
+            b1, b2 = st.columns(2)
+            b1.button("Add source", icon=":material/add:", on_click=add_source, width="stretch",
+                      disabled=st.session_state.n_sources >= MAX_SOURCES)
+            b2.button("Remove last", icon=":material/remove:", on_click=remove_source, width="stretch",
+                      disabled=st.session_state.n_sources <= 1)
         files = st.file_uploader("Or upload .txt / .md files", type=["txt", "md"],
-                                 accept_multiple_files=True)
+                                 accept_multiple_files=True, key=f"uploads_{st.session_state.upload_gen}")
         for f in files or []:
             text = f.getvalue().decode("utf-8", errors="replace").strip()
             if text:
@@ -1070,18 +1125,20 @@ with col_s:
         st.caption("Cut into 2-sentence windows and checked by the fine-tuned verifier, with its own calibration."
                    if FINETUNED_DIR.exists() else "Cut into 2-sentence windows and checked by the zero-shot verifier.")
     else:
-        st.html('<div class="v-panel"><div class="v-h" style="margin-top:0">SciFact science corpus</div>'
-                '<p style="margin:0 0 .5rem">5,183 biomedical research abstracts. For each claim Verity '
-                'finds the 3 most relevant abstracts, then the fine-tuned verifier checks every '
-                '2-sentence window inside them.</p>'
+        st.html('<div class="v-panel"><h4>SciFact science corpus</h4>'
+                '<p>5,183 biomedical research abstracts. For each claim Verity finds the 3 most relevant '
+                'abstracts, then the fine-tuned verifier checks every 2-sentence window inside them.</p>'
                 '<p class="v-muted" style="margin:0;font-size:.85rem">The first check in a session loads '
                 'the corpus and its embeddings, which takes longer. A claim outside biomedicine will '
                 'usually come back as not enough evidence: that is the corpus speaking, not a judgement '
                 'that the claim is false.</p></div>')
 
 st.write("")
-run = st.button("Check answer", type="primary", icon=":material/fact_check:", width="stretch")
-st.html('<hr class="v-merge" aria-hidden="true">')
+r1, r2 = st.columns([4, 1], gap="small")
+run = r1.button("Check answer", type="primary", icon=":material/fact_check:", width="stretch")
+r2.button("Clear all", icon=":material/restart_alt:", on_click=clear_all, width="stretch",
+          help="Empty the answer, every source and the uploaded files.")
+st.html('<hr class="v-rule" aria-hidden="true">')
 
 # ------------------------------------------------------------------ run
 out = st.container()
@@ -1124,18 +1181,16 @@ report = st.session_state.get("report")
 with out:
     if report is None:
         if not run:
-            st.html('<div class="v-step v-order"><span class="v-hex" aria-hidden="true"></span>'
-                    '<span>03</span>The report</div>'
-                    '<div class="v-panel v-empty"><div class="v-h" style="margin:0 0 .3rem">'
-                    'Results appear here</div><p class="v-muted">Paste an answer and its sources, or '
-                    'load an example, then press <b>Check answer</b>. Each claim comes back as one of:</p>'
+            st.html('<div class="v-sec"><b>03</b><span>The report</span></div>'
+                    '<div class="v-panel v-empty"><h4>Results appear here</h4><p class="v-muted">Paste an answer '
+                    'and its sources, or load an example, then press <b>Check answer</b>. Each claim comes '
+                    'back as one of:</p>'
                     f'<div class="v-legend">{"".join(chip(k) for k in VERDICTS)}</div></div>')
     elif not report.claims:
         st.info("No checkable sentences were found in the answer.", icon=":material/info:")
     else:
         eng = st.session_state.get("engine", {})
-        st.html('<div class="v-step v-order"><span class="v-hex" aria-hidden="true"></span>'
-                '<span>03</span>The report</div>')
+        st.html('<div class="v-sec"><b>03</b><span>The report</span></div>')
         doc, guess = report_component(report, eng, theme_base())
         if hasattr(st, "iframe"):          # components.v1.html is deprecated in newer Streamlit
             st.iframe(doc, height=guess)
@@ -1147,8 +1202,44 @@ with out:
         c2.caption("Verdicts are judged only against the sources listed, by a model that can be wrong. "
                    "Read the decisive passage before relying on a verdict.")
 
-# ------------------------------------------------------------------ under the hood
-st.write("")
+# ------------------------------------------------------------------ how it works, verdicts, limits
+STEPS = [
+    ("Decompose", "Split the answer into claims: one per sentence, or an LLM rewrites sentences into "
+                  "single-fact claims."),
+    ("Retrieve", "Find the passages most likely to settle each claim: BM25 keyword search combined "
+                 "with embeddings."),
+    ("Window", "Cut the evidence into overlapping 2-sentence windows, so each passage the verifier "
+               "reads stays short and specific."),
+    ("Verify", "A fine-tuned DeBERTa-v3 natural-language-inference model scores every (evidence, "
+               "claim) pair."),
+    ("Decide", "The strongest supporting or refuting passage wins; conformal prediction turns its "
+               "calibrated probabilities into a verdict, or <i>Uncertain</i>."),
+]
+DEFS = {"SUPPORTED": "The evidence states or implies the claim.",
+        "REFUTED": "The evidence contradicts the claim.",
+        "NEI": "The sources do not settle it either way. Not the same as false.",
+        "UNCERTAIN": "At the calibrated 90% level the verifier could not narrow it to one label; "
+                     "the card lists the labels it could not rule out."}
+LIMITS = [
+    "It judges only against the sources given. If they are wrong, Verity agrees with them.",
+    "The 90% target is a long-run rate, calibrated on annotated evidence for science claims. It is "
+    "not a promise about any single claim, and on retrieved evidence or other kinds of text the "
+    "measured rate is lower (see the results).",
+    "The fine-tuned verifier leans towards \"not enough evidence\" on true claims.",
+    "Long sources are cut into two-sentence windows, so claims that need far-apart facts can be missed.",
+    "Pasted sources and the SciFact corpus use the same verifier and calibration; the SciFact design "
+    "was chosen on held-out claims.",
+    "Read the cited evidence before relying on a verdict.",
+]
+st.html('<hr class="v-rule" aria-hidden="true"><section id="how"><p class="v-eyebrow">How it works</p>'
+        '<h2 class="v-h2">From one answer to cited verdicts, in five steps</h2><ol class="v-steps">'
+        + "".join(f'<li><span class="v-n">{k}</span><b>{t}</b>{d}</li>' for k, (t, d) in enumerate(STEPS, 1))
+        + '</ol><div class="v-defs">'
+        + "".join(f'<div class="v-{k}">{chip(k)}<p>{d}</p></div>' for k, d in DEFS.items())
+        + '</div></section><hr class="v-rule" aria-hidden="true"><section id="limits">'
+        '<p class="v-eyebrow">Limits</p><h2 class="v-h2">What Verity cannot promise</h2><ul class="v-limits">'
+        + "".join(f"<li>{x}</li>" for x in LIMITS) + "</ul></section>")
+
 with st.expander("Under the hood: what was measured", icon=":material/science:"):
     headline_md = results_block()
     if headline_md:
@@ -1160,3 +1251,8 @@ with st.expander("Under the hood: what was measured", icon=":material/science:")
     if figs:
         for tab, (_, path) in zip(st.tabs([t for t, _ in figs]), figs):
             tab.image(str(path), width="stretch")
+
+st.html(f'<footer class="v-foot"><span>Verity &middot; Ruhin Zaidi &middot; 23215149 &middot; BCA (Honours) '
+        f'Generative AI mini project</span><span><a href="{GITHUB}" target="_blank" rel="noopener">Source on '
+        f'GitHub</a> &middot; <a href="{MODEL_HUB}" target="_blank" rel="noopener">Verifier on Hugging Face</a>'
+        f'</span></footer>')
