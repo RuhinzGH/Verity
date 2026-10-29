@@ -842,7 +842,7 @@ def _engine(e: dict) -> str:
     parts = [esc(e["mode"]), esc(verifier_name(e["verifier"])),
              esc(evidence_desc(e)),
              esc(f"T={e['temperature']:.2f}"), esc(f"q̂={e['qhat']:.3f} (90% target)"),
-             esc(f"{e['seconds']:.1f} s")]
+             esc(f"{e['seconds']:.1f} s" + (f" on {e['threads']} CPU threads" if e.get("threads") else ""))]
     return ('<div class="engine"><b>ENGINE</b>'
             + "".join(f'<span><i aria-hidden="true">/</i>{x}</span>' for x in parts) + "</div>")
 
@@ -1220,6 +1220,7 @@ if checking:
         scan.html(f'<div class="v-panel" role="status"><div class="v-scan-label">{msg}</div>'
                   '<div class="v-scan"></div></div>')
         try:
+            import torch
             t0 = time.perf_counter()
             base = scifact_verity() if mode == SRC_SCIFACT else paste_verity(tuple(sources))
             v = copy.copy(base)          # shallow copy: the cached object is shared by sessions
@@ -1233,6 +1234,7 @@ if checking:
                         else f"pasted sources ({len(sources)})",
                 "scifact": mode == SRC_SCIFACT, "verifier": v.verifier, "temperature": v.temperature,
                 "qhat": v.qhat, "select": v.select, "top_k": getattr(v, "top_k", None), "seconds": time.perf_counter() - t0,
+                "threads": torch.get_num_threads(),
                 "claims_by": "LLM" if use_llm else "sentences"}
         except Exception as e:                       # shown to the user, not swallowed
             st.session_state.pop("report", None)

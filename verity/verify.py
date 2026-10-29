@@ -28,10 +28,27 @@ def _device() -> str:
     return "cuda" if torch.cuda.is_available() else "cpu"
 
 
+def cpu_limit() -> int:
+    """CPUs this process may really use. A container (such as the live app's) sees every
+    core of its host but gets only a share of them; torch would start one thread per
+    visible core and the threads would then wait on each other."""
+    import os
+    n = len(os.sched_getaffinity(0)) if hasattr(os, "sched_getaffinity") else (os.cpu_count() or 1)
+    try:                                                  # cgroup v2 quota, e.g. "200000 100000"
+        quota, period = open("/sys/fs/cgroup/cpu.max").read().split()
+        if quota != "max":
+            n = min(n, max(1, -(-int(quota) // int(period))))
+    except (OSError, ValueError):
+        pass
+    return n
+
+
 class NLIVerifier:
     def __init__(self, name_or_path: str, max_length: int = 512, batch_size: int = 16):
         import torch
         from transformers import AutoModelForSequenceClassification, AutoTokenizer
+        if torch.get_num_threads() > cpu_limit():
+            torch.set_num_threads(cpu_limit())
         path = NLI_MODELS.get(name_or_path, name_or_path)
         self.name = Path(str(name_or_path)).name
         self.tok = AutoTokenizer.from_pretrained(str(path))
