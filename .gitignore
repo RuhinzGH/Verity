@@ -1,0 +1,19 @@
+# local environment and secrets
+.venv/
+venv/
+.env
+
+# never published: private notes, archives, the submission zip
+_private/
+*.zip
+dist/
+
+# downloaded or generated locally (see README)
+data/raw/
+data/cache/
+models/
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
