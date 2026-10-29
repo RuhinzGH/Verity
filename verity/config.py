@@ -35,6 +35,7 @@ NLI_MODELS = {
 }
 FINETUNED_NLI = MODELS / "verity-deberta-scifact"
 FINETUNED_NLI_HUB = "RuhinZ/verity-deberta-scifact"   # the same weights, for the live app and fresh clones
+INDEX_HUB = "RuhinZ/verity-scifact-index"             # bge-base embeddings of the SciFact corpus
 
 # LLMs (Groq API; 1,000 requests/day and 8,000 tokens/min per model on this account)
 LLM_DECOMPOSER = "openai/gpt-oss-20b"

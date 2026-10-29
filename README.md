@@ -93,6 +93,7 @@ pip install -r requirements.txt
 
 python -m verity.data                      # download the three benchmarks (parquet files)
 python -m verity.models verifier           # download the fine-tuned verifier (~740 MB)
+python -m verity.models index              # download the SciFact corpus embeddings (16 MB)
 python -m verity.models                    # download the local LLMs (optional, ~9 GB)
 
 streamlit run app.py                       # the interface, at http://localhost:8501
@@ -254,14 +255,18 @@ Dockerfile       the image the live app runs in
 ## Deployment
 
 The live app runs on a free Hugging Face Space (2 CPU cores, 16 GB memory) from the
-`Dockerfile` in this repository. When the image is built it downloads the benchmarks and
-the fine-tuned verifier, and computes the embeddings of the 5,183 SciFact abstracts once,
-so a visitor never waits for the index to be built. The verifier runs on the CPU, which is
-fast enough for one answer at a time.
+`Dockerfile` in this repository. When the image is built it downloads the benchmarks, the
+fine-tuned verifier and the embeddings of the 5,183 SciFact abstracts. The embeddings take
+about an hour to compute on a CPU, so they are computed once and published as a small
+dataset (`RuhinZ/verity-scifact-index`); a visitor never waits for the index. On the
+Space's CPU, a check against pasted sources takes about a second, and one against the
+SciFact corpus about half a minute (the verifier reads every window of the 3 top abstracts
+for each claim; batching windows of similar length made this about a third faster).
 
 ```bash
 huggingface-cli login                      # once, with a write token
 python -m deploy.publish model             # upload models/verity-deberta-scifact to the Hub
+python -m deploy.publish index             # upload the SciFact embeddings (computed here once)
 python -m deploy.publish space             # upload the app; the Space rebuilds itself
 ```
 

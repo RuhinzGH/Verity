@@ -13,9 +13,10 @@ ENV HOME=/home/user HF_HOME=/home/user/.cache/huggingface
 WORKDIR /home/user/app
 COPY --chown=user . .
 
-# Benchmarks, the fine-tuned verifier and the SciFact index are built into the image,
-# so the first visitor does not wait for them
-RUN python -m verity.data && python -m verity.models verifier && python -m deploy.warm
+# Benchmarks, the fine-tuned verifier and the SciFact index (embeddings computed once on the
+# laptop: about an hour on a CPU) are downloaded into the image, so no visitor waits for them
+RUN python -m verity.data && python -m verity.models verifier && python -m verity.models index \
+ && python -m deploy.warm
 
 EXPOSE 7860
 # XSRF protection blocks file uploads inside the Space's iframe
