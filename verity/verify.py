@@ -34,12 +34,15 @@ def cpu_limit() -> int:
     visible core and the threads would then wait on each other."""
     import os
     n = len(os.sched_getaffinity(0)) if hasattr(os, "sched_getaffinity") else (os.cpu_count() or 1)
-    try:                                                  # cgroup v2 quota, e.g. "200000 100000"
-        quota, period = open("/sys/fs/cgroup/cpu.max").read().split()
-        if quota != "max":
-            n = min(n, max(1, -(-int(quota) // int(period))))
-    except (OSError, ValueError):
-        pass
+    for files in (("/sys/fs/cgroup/cpu.max",),                     # cgroup v2: "200000 100000"
+                  ("/sys/fs/cgroup/cpu/cpu.cfs_quota_us", "/sys/fs/cgroup/cpu/cpu.cfs_period_us")):  # v1
+        try:
+            vals = " ".join(open(f).read() for f in files).split()
+            quota, period = int(vals[0]), int(vals[1])
+        except (OSError, ValueError, IndexError):         # missing file, or "max" (no quota)
+            continue
+        if quota > 0:
+            n = min(n, max(1, -(-quota // period)))
     return n
 
 
