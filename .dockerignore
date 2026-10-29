@@ -1,0 +1,14 @@
+.git
+.github
+.venv
+venv
+.env
+_private
+*.zip
+dist
+data
+models
+__pycache__
+*.pyc
+.pytest_cache
+colab
