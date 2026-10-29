@@ -131,3 +131,8 @@ def test_claim_parts_cover_the_sentence_in_order():
 ])
 def test_claim_parts_gives_up_when_parts_cannot_be_told_apart(sentence, claims):
     assert claim_parts(sentence, claims) == []
+
+
+def test_number_words_meet_digits():
+    from verity.text import content_words
+    assert content_words("Water freezes at zero degrees") & content_words("freezes at 0 degrees") == {"freez", "0", "degre"}

@@ -45,7 +45,8 @@ the laptop version gives up.
 | Verify | `verity/verify.py` | NLI cross-encoders (zero-shot and fine-tuned) and LLM judges, all returning SUPPORTED / REFUTED / NEI probabilities |
 | Decide | `verity/conformal.py` | Temperature scaling, then split conformal prediction: a label set that contains the true label 90% of the time on data like the calibration set; more than one label means UNCERTAIN |
 | Pipeline | `verity/pipeline.py` | All of the above in one call: `Verity(sources).check(answer)` |
-| Interface | `app.py` | Streamlit app: paste an answer and sources, see every claim coloured and cited |
+| Files | `verity/files.py` | Text out of uploaded .txt, .md, .pdf and .docx files (text only: images and scanned pages are not read) |
+| Interface | `app.py` | Streamlit app: paste or upload an answer and its sources, see every claim coloured and cited |
 
 ## What was measured
 

@@ -56,9 +56,18 @@ with would you your yours yet via per its one""".split())
 WORD = re.compile(r"[^\W_]+(?:'[^\W_]+)?")
 
 
+# number words meet their digits ("zero degrees" and "0 degrees" share a word)
+NUMBER_WORDS = {w: str(i) for i, w in enumerate(
+    "zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen "
+    "fifteen sixteen seventeen eighteen nineteen twenty".split())}
+
+
 def stem(w: str) -> str:
-    """Lower-case and strip a few English endings, so 'moons' meets 'moon'."""
+    """Lower-case and strip a few English endings, so 'moons' meets 'moon'; number words
+    become digits."""
     w = w.lower()
+    if w in NUMBER_WORDS:
+        return NUMBER_WORDS[w]
     if w.endswith("'s"):
         w = w[:-2]
     for suf, keep in (("ing", 4), ("ies", 3), ("ed", 3), ("es", 3), ("s", 3)):

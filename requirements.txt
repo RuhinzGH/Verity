@@ -19,6 +19,8 @@ matplotlib
 streamlit>=1.66
 groq
 python-dotenv
+pypdf==5.1.0
+python-docx==1.1.2
 tqdm
 pytest
 sentencepiece

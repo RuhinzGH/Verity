@@ -19,6 +19,7 @@ from pathlib import Path
 import streamlit as st
 import streamlit.components.v1 as components
 
+from verity.files import TYPES as FILE_TYPES, read_text
 from verity.text import STOPWORDS, WORD, claim_parts, content_words, stem
 
 ROOT = Path(__file__).resolve().parent
@@ -159,6 +160,7 @@ h3 { font: 700 1.08rem/1.3 "Inter Tight", "Inter", sans-serif; letter-spacing: -
 .key { margin-top: .85rem; }
 
 /* ---------- answer */
+.answer-panel { will-change: transform; transition: transform .28s cubic-bezier(.2,.8,.2,1); }
 .answer { font-size: 1.03rem; line-height: 2.05; overflow-wrap: anywhere; }
 .s { cursor: pointer; border-radius: 5px; outline-offset: 1px; }
 .s .t { padding: .12rem .16rem; border-radius: 4px; box-decoration-break: clone; -webkit-box-decoration-break: clone;
@@ -166,8 +168,9 @@ h3 { font: 700 1.08rem/1.3 "Inter Tight", "Inter", sans-serif; letter-spacing: -
   transition: background .18s, box-shadow .18s, color .25s; }
 .s.v-REFUTED .t { border-bottom-style: double; border-bottom-width: 3px; }
 .s.v-NEI .t, .s.v-UNCERTAIN .t { border-bottom-style: dashed; }
-.s:hover .t, .s.lit .t { background: color-mix(in srgb, var(--c) 30%, transparent);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--c) 70%, transparent); }
+/* hover lifts the tint only: a ring drawn around each span would show a seam where the
+   sentence's last word (kept on one line with its marker) begins */
+.s:hover .t, .s.lit .t { background: color-mix(in srgb, var(--c) 32%, transparent); border-bottom-color: var(--c); }
 .s:focus-visible { outline: 2px solid var(--brand); }
 .s.off .t { background: transparent; border-bottom-color: color-mix(in srgb, var(--text) 25%, transparent); }
 .s.off .mark { filter: grayscale(1); }
@@ -404,18 +407,21 @@ REPORT_JS = r"""
   var saved = null; try { saved = store && store.getItem('verity-filter-' + KEY); } catch (e) {}
   if (saved && saved !== 'ALL' && chips.some(function (b) { return b.dataset.f === saved && !b.disabled; })) setFilter(saved);
 
-  /* ---- reveal: crimson noise resolving, sentence by sentence, into the verdict view */
+  /* ---- a new report: scroll to its start (once), so the result is seen without hunting for it */
+  var scrolled = false; try { scrolled = store && store.getItem('verity-scrolled-' + KEY) === '1'; } catch (e) {}
+  if (!scrolled) {
+    try {
+      store && store.setItem('verity-scrolled-' + KEY, '1');
+      var fe = window.frameElement;
+      if (fe) { fe.style.scrollMarginTop = '96px'; fe.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' }); }
+    } catch (e) {}
+  }
+
+  /* ---- reveal: scrambled noise decoding, sentence by sentence, into the verdict view */
   if (doc.classList.contains('revealing')) {
     try { store && store.setItem('verity-seen-' + KEY, '1'); } catch (e) {}
     var answer = document.getElementById('answer'), noise = '#%&*+=<>/\\|{}[]?!01ABEFHKMNRSTVXZ';
     answer.setAttribute('aria-busy', 'true');
-    /* a fresh report: bring it into view, so the reveal is seen rather than played off-screen */
-    try {
-      var fe = window.frameElement;
-      if (fe && fe.getBoundingClientRect().top > parent.innerHeight * 0.6) {
-        fe.style.scrollMarginTop = '132px'; fe.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    } catch (e) {}
     var n = sents.length, stagger = Math.min(190, 600 / Math.max(1, n)), dur = 440, t0 = performance.now() + 120;
     var items = [];
     sents.forEach(function (s, k) {
@@ -481,7 +487,12 @@ CSS = """
 .v-muted { color: color-mix(in srgb, currentColor 66%, transparent); }
 
 /* ---------- page */
+/* Streamlit's header bar is transparent but full width, so it sat over the nav links:
+   let the pointer through everywhere except its own buttons */
 [data-testid="stHeader"] { background: transparent; }
+[data-testid="stHeader"], [data-testid="stHeader"] * { pointer-events: none; }
+[data-testid="stHeader"] button, [data-testid="stHeader"] button *, [data-testid="stHeader"] a,
+[data-testid="stHeader"] [role="button"] { pointer-events: auto; }
 [data-testid="stSidebarCollapsedControl"] { display: none; }
 .block-container, [data-testid="stMainBlockContainer"] { padding-top: 1.6rem; padding-bottom: 4rem; max-width: 1200px; }
 [data-testid="stMain"] { background:
@@ -683,6 +694,15 @@ def paste_verity(sources: tuple[tuple[str, str], ...]):
 def scifact_verity():
     from verity.pipeline import Verity
     return Verity.scifact()
+
+
+@st.cache_data(show_spinner=False, max_entries=32)
+def file_text(name: str, data: bytes) -> str:
+    """The text of an uploaded file, read once per file (PDFs are slow to parse)."""
+    return read_text(name, data)
+
+
+FILE_NOTE = "Only the text is read: images and scanned pages (a picture of text) are not."
 
 
 @st.cache_resource(show_spinner=False)
@@ -895,7 +915,9 @@ def _confidence(c, qhat: float) -> str:
             + (", ".join(NAMES[l] for l in c.label_set) or "none") + ".")
     if c.verdict == "UNCERTAIN":
         open_ = ", ".join(NAMES[l] for l in c.label_set) if c.label_set else "none reaches the line"
-        foot = f'Could not rule out: <b>{esc(open_)}</b>.'
+        lean = max(LABELS, key=lambda l: c.probs.get(l, 0))
+        foot = (f'Leans <b>{NAMES[lean].lower()}</b> ({pct(c.probs.get(lean, 0))}), but at the 90% level '
+                f'it could not rule out: <b>{esc(open_)}</b>.')
     else:
         foot = f'Only <b>{NAMES[c.verdict]}</b> reaches the line, so it is the verdict.'
     return (f'<div class="conf" role="img" aria-label="{esc(aria)}">'
@@ -981,7 +1003,8 @@ def report_component(report, eng: dict, theme: str) -> tuple[str, int]:
 st.session_state.setdefault("n_sources", 1)
 st.session_state.setdefault("source_mode", SRC_PASTE)
 st.session_state.setdefault("answer", "")
-st.session_state.setdefault("upload_gen", 0)       # bumped to empty the file uploader
+st.session_state.setdefault("upload_gen", 0)       # bumped to empty the source file uploader
+st.session_state.setdefault("answer_gen", 0)       # ... and the answer file uploader
 # keep source fields alive while their widgets are hidden (SciFact mode)
 for _k in [k for k in st.session_state if str(k).startswith("src_")]:
     st.session_state[_k] = st.session_state[_k]
@@ -1016,6 +1039,26 @@ def remove_source():
 def clear_answer():
     st.session_state.answer = ""
     st.session_state.pop("report", None)
+    st.session_state.pop("answer_note", None)
+    st.session_state.answer_gen += 1
+
+
+def load_answer_file(key: str):
+    """An uploaded answer replaces the text in the answer box (which can still be edited)."""
+    f = st.session_state.get(key)
+    st.session_state.pop("answer_note", None)
+    if f is None:
+        return
+    text = file_text(f.name, f.getvalue())
+    if text:
+        st.session_state.answer = text
+        st.session_state.pop("report", None)
+    else:
+        st.session_state.answer_note = f"No text found in {f.name}. {FILE_NOTE}"
+
+
+def start_check():
+    st.session_state.checking = True
 
 
 def clear_source(i: int):
@@ -1077,6 +1120,11 @@ with col_a, st.container(key="card_answer"):
                   "they do not cover. The SciFact example searches the science corpus.")
     st.text_area("AI answer to check", key="answer", height=208,
                  placeholder="Paste the answer an AI assistant gave you ...")
+    _ak = f"answer_file_{st.session_state.answer_gen}"
+    st.file_uploader("Or upload the answer: .txt, .md, .pdf or .docx", type=FILE_TYPES, key=_ak,
+                     on_change=load_answer_file, args=(_ak,), help=FILE_NOTE)
+    if st.session_state.get("answer_note"):
+        st.warning(st.session_state.answer_note, icon=":material/description:")
     has_key = groq_key_available()
     use_llm = st.toggle("Split into single-fact claims with an LLM", key="use_llm", disabled=not has_key,
                         help="Off: one claim per sentence, fully offline. On: the answer text is sent "
@@ -1110,12 +1158,18 @@ with col_s, st.container(key="card_sources"):
                       disabled=st.session_state.n_sources >= MAX_SOURCES)
             b2.button("Remove last", icon=":material/remove:", on_click=remove_source, width="stretch",
                       disabled=st.session_state.n_sources <= 1)
-        files = st.file_uploader("Or upload .txt / .md files", type=["txt", "md"],
-                                 accept_multiple_files=True, key=f"uploads_{st.session_state.upload_gen}")
+        files = st.file_uploader("Or upload sources: .txt, .md, .pdf or .docx", type=FILE_TYPES,
+                                 accept_multiple_files=True, key=f"uploads_{st.session_state.upload_gen}",
+                                 help=FILE_NOTE)
+        empty = []
         for f in files or []:
-            text = f.getvalue().decode("utf-8", errors="replace").strip()
+            text = file_text(f.name, f.getvalue())
             if text:
                 sources.append((f.name, text))
+            else:
+                empty.append(f.name)
+        if empty:
+            st.warning(f"No text found in {', '.join(empty)}. {FILE_NOTE}", icon=":material/description:")
         # Verity names passages "<name>#<j>", so duplicate names would merge two sources
         seen: dict[str, int] = {}
         for i, (n, t) in enumerate(sources):
@@ -1135,20 +1189,30 @@ with col_s, st.container(key="card_sources"):
 
 st.write("")
 r1, r2 = st.columns([4, 1], gap="small")
-run = r1.button("Check answer", type="primary", icon=":material/fact_check:", width="stretch")
+checking = st.session_state.get("checking", False)
+r1.button("Checking ..." if checking else "Check answer", key="run_btn", type="primary", width="stretch",
+          icon=":material/hourglass_top:" if checking else ":material/fact_check:", disabled=checking,
+          on_click=start_check)
 r2.button("Clear all", icon=":material/restart_alt:", on_click=clear_all, width="stretch",
           help="Empty the answer, every source and the uploaded files.")
 st.html('<hr class="v-rule" aria-hidden="true">')
 
 # ------------------------------------------------------------------ run
+# Pressing the button only sets `checking`; this run shows "Checking ..." on a disabled
+# button while the check works, then reruns so the button and the report are redrawn.
 out = st.container()
-if run:
+note = st.session_state.pop("flash", None)
+if note:
+    getattr(out, note[0])(note[1], icon=note[2])
+if checking:
+    st.session_state.checking = False
     answer = st.session_state.get("answer", "")
     if not answer.strip():
-        out.warning("Paste an answer to check first, or load an example.", icon=":material/edit_note:")
+        st.session_state.flash = ("warning", "Paste an answer to check first, or load an example.",
+                                  ":material/edit_note:")
     elif mode == SRC_PASTE and not sources:
-        out.warning("Add the text of at least one source, or switch to the SciFact corpus.",
-                    icon=":material/library_add:")
+        st.session_state.flash = ("warning", "Add the text of at least one source, or switch to the SciFact corpus.",
+                                  ":material/library_add:")
     else:
         scan = out.empty()
         msg = ("Loading the SciFact corpus and checking claims" if mode == SRC_SCIFACT
@@ -1172,15 +1236,15 @@ if run:
                 "claims_by": "LLM" if use_llm else "sentences"}
         except Exception as e:                       # shown to the user, not swallowed
             st.session_state.pop("report", None)
-            out.error(f"The check could not run: {e}", icon=":material/error:")
-        finally:
-            scan.empty()
+            st.session_state.flash = ("error", f"The check could not run: {e}", ":material/error:")
+        scan.empty()
+    st.rerun()
 
 # ------------------------------------------------------------------ output
 report = st.session_state.get("report")
 with out:
     if report is None:
-        if not run:
+        if not note:
             st.html('<div class="v-sec"><b>03</b><span>The report</span></div>'
                     '<div class="v-panel v-empty"><h4>Results appear here</h4><p class="v-muted">Paste an answer '
                     'and its sources, or load an example, then press <b>Check answer</b>. Each claim comes '
